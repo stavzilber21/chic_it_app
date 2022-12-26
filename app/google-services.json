@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "661982452041",
+    "firebase_url": "https://chicit-a5e00-default-rtdb.firebaseio.com",
+    "project_id": "chicit-a5e00",
+    "storage_bucket": "chicit-a5e00.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:661982452041:android:b7134d58ce1d1d430c2298",
+        "android_client_info": {
+          "package_name": "com.example.chic_it_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "661982452041-7o28aenh9mo5ce1amsdnlv290r1l70ib.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSmgLxLCg5LRKegB9Yn230dXCJZqzHptw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "661982452041-7o28aenh9mo5ce1amsdnlv290r1l70ib.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
