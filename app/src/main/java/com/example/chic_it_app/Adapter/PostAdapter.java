@@ -14,6 +14,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.chic_it_app.Fragments.PostDetailFragment;
+import com.example.chic_it_app.Model.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -61,7 +62,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
         FirebaseDatabase.getInstance().getReference().child("Users").child(post.getDescription()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                User user = dataSnapshot.getValue(User.class);
+                User user = dataSnapshot.getValue(User.class);
 //
 //                if (user.getImageurl()!= null && user.getImageurl().equals("default")) {
 //                    holder.imageProfile.setImageResource(R.mipmap.ic_launcher);
