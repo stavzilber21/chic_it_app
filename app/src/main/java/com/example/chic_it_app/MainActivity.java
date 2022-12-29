@@ -1,7 +1,9 @@
 package com.example.chic_it_app;
 //import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -71,6 +73,28 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         popup.show();
     }
 
+
+    public void dialog_exit(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setTitle("you sure that you want to exit?");
+        builder.setMessage("");
+        builder.setPositiveButton("yes please", (dialog, which) ->
+        {
+            Toast.makeText(MainActivity.this, "bye-bye!", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(MainActivity.this , LoginActivity.class));
+                    });
+
+        builder.setNegativeButton("no", (dialog, which) ->
+        {
+            Toast.makeText(MainActivity.this, "good to have you back!", Toast.LENGTH_SHORT).show();
+//            startActivity(new Intent(MainActivity.this , MainActivity.class));
+            });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+    }
+
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
@@ -78,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 startActivity(new Intent(MainActivity.this , EditProfileActivity.class));
                 break;
             case R.id.logOut:
-                startActivity(new Intent(MainActivity.this , LoginActivity.class));
+                dialog_exit();
                 break;
             default:
                 return false;

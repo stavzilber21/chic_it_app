@@ -8,12 +8,14 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.chic_it_app.Fragments.PostDetailFragment;
+import com.example.chic_it_app.MainActivity;
 import com.example.chic_it_app.Model.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -63,19 +65,19 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
         holder.description.setText(post.getDescription());
         holder.price.setText(post.getPrice());
         holder.store.setText(post.getStore());
+        holder.type.setText(post.getType());
 
-        FirebaseDatabase.getInstance().getReference().child("Users").child(post.getDescription()).addValueEventListener(new ValueEventListener() {
+        FirebaseDatabase.getInstance().getReference().child("Users").child(post.getPublisher()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
-//
-//                if (user.getImageurl()!= null && user.getImageurl().equals("default")) {
-//                    holder.imageProfile.setImageResource(R.mipmap.ic_launcher);
-//                } else {
-//                    Picasso.get().load(user.getImageurl()).placeholder(R.mipmap.ic_launcher).into(holder.imageProfile);
-//                }
-//                holder.username.setText(user.getUsername());
-//                holder.author.setText(user.getName());
+                if (user.getImageurl().equals("default")) {
+                    holder.imageProfile.setImageResource(R.mipmap.ic_launcher);
+                } else {
+                    Picasso.get().load(user.getImageurl()).placeholder(R.mipmap.ic_launcher).into(holder.imageProfile);
+                }
+                holder.username.setText(user.getUsername());
+//                holder.author.setText(user.getFullname());
             }
 
             @Override
@@ -135,16 +137,16 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
             }
         });
 
-//        holder.imageProfile.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                mContext.getSharedPreferences("PROFILE", Context.MODE_PRIVATE)
-//                        .edit().putString("profileId", post.getPublisher()).apply();
-//
-//                ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction()
-//                        .replace(R.id.fragment_container, new ProfileFragment()).commit();
-//            }
-//        });
+        holder.imageProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mContext.getSharedPreferences("PROFILE", Context.MODE_PRIVATE)
+                        .edit().putString("profileId", post.getPublisher()).apply();
+
+                ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new ProfileFragment()).commit();
+            }
+        });
 
         holder.username.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -157,16 +159,16 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
             }
         });
 
-        holder.author.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mContext.getSharedPreferences("PROFILE", Context.MODE_PRIVATE)
-                        .edit().putString("profileId", post.getPublisher()).apply();
-
-                ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new ProfileFragment()).commit();
-            }
-        });
+//        holder.author.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                mContext.getSharedPreferences("PROFILE", Context.MODE_PRIVATE)
+//                        .edit().putString("profileId", post.getPublisher()).apply();
+//
+//                ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction()
+//                        .replace(R.id.fragment_container, new ProfileFragment()).commit();
+//            }
+//        });
 
         holder.postImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -187,6 +189,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
 //                mContext.startActivity(intent);
 //            }
 //        });
+        holder.contact_us.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
 
     }
 
@@ -197,7 +205,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
 
     public class Viewholder extends RecyclerView.ViewHolder {
 
-        //        public ImageView imageProfile;
+        public ImageView imageProfile;
         public ImageView postImage;
         //        public ImageView like;
         public ImageView save;
@@ -205,18 +213,19 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
 //        public ImageView more;
 
         public TextView username;
-        public TextView noOfLikes;
+        public TextView contact_us;
         public TextView author;
         //        public TextView noOfComments;
         TextView description;
         TextView price;
         TextView store;
+        TextView type;
 
 
         public Viewholder(@NonNull View itemView) {
             super(itemView);
 
-//            imageProfile = itemView.findViewById(R.id.image_profile);
+            imageProfile = itemView.findViewById(R.id.image_profile);
             postImage = itemView.findViewById(R.id.post_image);
 //            like = itemView.findViewById(R.id.like);
 //            comment = itemView.findViewById(R.id.comment);
@@ -224,12 +233,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
 //            more = itemView.findViewById(R.id.more);
 
             username = itemView.findViewById(R.id.username);
-//            noOfLikes = itemView.findViewById(R.id.no_of_likes);
-            author = itemView.findViewById(R.id.author);
+            contact_us = itemView.findViewById(R.id.contact_us);
+//            author = itemView.findViewById(R.id.author);
 //            noOfComments = itemView.findViewById(R.id.no_of_comments);
             description = itemView.findViewById(R.id.description);
             store = itemView.findViewById(R.id.store);
             price = itemView.findViewById(R.id.price);
+            type = itemView.findViewById(R.id.type);
 
         }
     }
