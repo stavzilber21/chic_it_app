@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.chic_it_app.Adapter.PostAdapter;
 import com.example.chic_it_app.Model.Post;
@@ -36,8 +38,8 @@ public class SearchFragment extends Fragment {
     private RecyclerView recyclerView;
     private List<Post> mPosts;
     private PostAdapter postAdapter;
-
-    private EditText search_bar;
+    private SearchView searchView;
+//    private EditText search_bar;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -45,7 +47,7 @@ public class SearchFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search, container, false);
 
-        recyclerView = view.findViewById(R.id.recycler_view_users);
+        recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -53,25 +55,39 @@ public class SearchFragment extends Fragment {
         postAdapter = new PostAdapter(getContext() , mPosts);
         recyclerView.setAdapter(postAdapter);
 
-        search_bar = view.findViewById(R.id.search_bar);
-
+//        search_bar = view.findViewById(R.id.search_bar);
+        searchView = view.findViewById(R.id.searchView);
+        searchView.clearFocus();
         readPosts();
-
-        search_bar.addTextChangedListener(new TextWatcher() {
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+            public boolean onQueryTextSubmit(String query) {
+                return false;
             }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                searchPost(s.toString());
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
+            public boolean onQueryTextChange(String newText) {
+                filterPost(newText);
+                return true;
             }
         });
+
+
+//        search_bar.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//
+//            }
+//
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                searchPost(s.toString());
+//            }
+//
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//            }
+//        });
 
         return view;
     }
@@ -84,12 +100,12 @@ public class SearchFragment extends Fragment {
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (TextUtils.isEmpty(search_bar.getText().toString())){
-                    mPosts.clear();
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()){
-                        Post post = snapshot.getValue(Post.class);
-                        mPosts.add(post);
-                    }
+//                if (TextUtils.isEmpty(searchView.getContext().toString())){
+                mPosts.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    Post post = snapshot.getValue(Post.class);
+                    mPosts.add(post);
+//                    }
 
                     postAdapter.notifyDataSetChanged();
                 }
@@ -103,28 +119,38 @@ public class SearchFragment extends Fragment {
 
     }
 
-    private void searchPost (String s) {
-
-        Query query = FirebaseDatabase.getInstance().getReference().child("Posts")
-                .orderByChild("description").startAt(s).endAt(s + "\uf8ff");
-
-        query.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                mPosts.clear();
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Post post = snapshot.getValue(Post.class);
-                    mPosts.add(post);
-                }
-                postAdapter.notifyDataSetChanged();
+    //    private void searchPost (String s) {
+//
+//        Query query = FirebaseDatabase.getInstance().getReference().child("Posts")
+//                .orderByChild("description").startAt(s).endAt(s + "\uf8ff");
+//
+//        query.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                mPosts.clear();
+//                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                    Post post = snapshot.getValue(Post.class);
+//                    mPosts.add(post);
+//                }
+//                postAdapter.notifyDataSetChanged();
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
+//    }
+    private void filterPost(String text) {
+        List<Post> filterList = new ArrayList<>();
+        for(Post post : mPosts){
+            if(post.getDescription().contains(text) || post.getStore().contains(text)||post.getPrice().contains(text) ){
+                filterList.add(post);
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+        }
+        if(!filterList.isEmpty()){
+            postAdapter.setFilter(filterList);
+        }
     }
-
 
 }

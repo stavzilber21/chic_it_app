@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         popup.show();
     }
 
-   @Override
+    @Override
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.edit_profile:

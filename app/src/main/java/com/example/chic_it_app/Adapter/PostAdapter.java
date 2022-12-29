@@ -43,6 +43,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
     }
 
+    public void setFilter(List<Post> postList){
+        this.mPosts = postList;
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public Viewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
