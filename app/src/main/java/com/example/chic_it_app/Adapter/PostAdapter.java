@@ -210,7 +210,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
         //        public ImageView like;
         public ImageView save;
 //        public ImageView comment;
-//        public ImageView more;
+        public ImageView more;
 
         public TextView username;
         public TextView contact_us;
@@ -230,7 +230,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
 //            like = itemView.findViewById(R.id.like);
 //            comment = itemView.findViewById(R.id.comment);
             save = itemView.findViewById(R.id.save);
-//            more = itemView.findViewById(R.id.more);
+            more = itemView.findViewById(R.id.more);
 
             username = itemView.findViewById(R.id.username);
             contact_us = itemView.findViewById(R.id.contact_us);
@@ -325,6 +325,5 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
 //        map.put("isPost", true);
 //
 //        FirebaseDatabase.getInstance().getReference().child("Notifications").child(firebaseUser.getUid()).push().setValue(map);
-//    }
+    }
 
-}

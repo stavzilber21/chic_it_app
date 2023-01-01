@@ -10,17 +10,21 @@ public class User {
     //    private String bio;
     private String imageurl;
     private String id;
+    private String gender;
+    private String size;
 
     public User() {
     }
 
-    public User(String name, String email, String username, String bio, String imageurl, String id) {
+    public User(String name, String email, String username, String bio, String imageurl, String id,String gender,String size) {
         this.fullname = name;
         this.email = email;
         this.username = username;
 //        this.bio = bio;
         this.imageurl = imageurl;
         this.id = id;
+        this.gender = gender;
+        this.size = size;
     }
 
     public String getFullname() {

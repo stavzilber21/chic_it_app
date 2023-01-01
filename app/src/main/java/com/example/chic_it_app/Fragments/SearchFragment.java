@@ -31,6 +31,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.example.chic_it_app.R;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class SearchFragment extends Fragment {
@@ -100,12 +101,12 @@ public class SearchFragment extends Fragment {
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                if (TextUtils.isEmpty(searchView.getContext().toString())){
                 mPosts.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()){
                     Post post = snapshot.getValue(Post.class);
                     mPosts.add(post);
-//                    }
+                    Collections.reverse(mPosts);
+
 
                     postAdapter.notifyDataSetChanged();
                 }
