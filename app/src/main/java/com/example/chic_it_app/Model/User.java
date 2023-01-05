@@ -12,6 +12,7 @@ public class User {
     private String id;
     private String gender;
     private String size;
+    private String phone;
 
     public User() {
     }
@@ -51,13 +52,7 @@ public class User {
         this.username = username;
     }
 
-//    public String getBio() {
-//        return bio;
-//    }
 
-//    public void setBio(String bio) {
-//        this.bio = bio;
-//    }
 
     public String getImageurl() {
         return imageurl;
@@ -74,4 +69,30 @@ public class User {
     public void setId(String id) {
         this.id = id;
     }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getSize() {
+        return size;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+
 }

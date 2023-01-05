@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.example.chic_it_app.Adapter.PostAdapter;
 import com.example.chic_it_app.Model.Post;
+import com.example.chic_it_app.UserActivity;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -144,10 +145,83 @@ public class SearchFragment extends Fragment {
 //    }
     private void filterPost(String text) {
         List<Post> filterList = new ArrayList<>();
+//        double Price = 0.0;
         for(Post post : mPosts){
-            if(post.getDescription().contains(text) || post.getStore().contains(text)||post.getPrice().contains(text) ){
+            if(post.getDescription().contains(text) || post.getStore().contains(text) ){
                 filterList.add(post);
             }
+            //if you search range of prices
+            else if(text.contains("-") && text.indexOf("-")!=text.length()-1){
+                if(text.endsWith("$")){
+                    String text_new = text.replace("$","");
+                    text = text_new;
+//                    if(post.getPrice().endsWith("$")){
+//                        String pr =post.getPrice().replace("$","");
+//                        Price = Double.parseDouble(pr);
+//                    }
+//                    if(post.getPrice().endsWith("₪")){
+//                        String pr =post.getPrice().replace("₪","");
+//                        Price = Double.parseDouble(pr)/3.25; //convert to dollar
+//                    }
+                }
+                if(text.endsWith("₪")){
+                    String text_new = text.replace("₪","");
+                    text = text_new;
+//                    if(post.getPrice().endsWith("$")){
+//                        String pr =post.getPrice().replace("$","");
+//                        Price = Double.parseDouble(pr)*3.25; //convert to shekel
+//                    }
+//                    if(post.getPrice().endsWith("₪")){
+//                        String pr =post.getPrice().replace("₪","");
+//                        Price = Double.parseDouble(pr);
+//                    }
+                }
+                int x = text.indexOf("-");
+                String first = text.substring(0,x);
+                String second = text.substring(x+1,text.length());
+                String p = post.getPrice();
+                int Price = Integer.decode(p);
+                if(Integer.valueOf(first) <=Integer.valueOf(second)){
+                    if(Price>= Integer.valueOf(first)&&Price<=Integer.valueOf(second)){
+                        filterList.add(post);
+                    }
+                }
+                if(Integer.valueOf(first) >=Integer.valueOf(second)){
+                    if(Price<=Integer.valueOf(first)&& Price>=Integer.valueOf(second)){
+                        filterList.add(post);
+                    }
+                }
+            }
+            //if you search price from 0 until your text number
+            else if(!text.contains("-") && Character.isDigit(text.charAt(0))){
+                //if this it price $ - just posts with $
+                if(text.endsWith("$")){
+                    String text_new = text.replace("$","");
+                    text = text_new;
+                    if(post.getPrice().endsWith("$")){
+                        post.getPrice().replace("$","");
+                        if(Integer.valueOf(post.getPrice())>= 0 && Integer.valueOf(post.getPrice())<=Integer.valueOf(text)){
+                            filterList.add(post);
+                        }
+                    }
+                }
+                //if this it price ₪- just posts with ₪
+                else if(text.endsWith("₪")){
+                    String text_new = text.replace("₪","");
+                    text = text_new;
+                    if(post.getPrice().endsWith("₪")){
+                        post.getPrice().replace("₪","");
+                        if(Integer.valueOf(post.getPrice())>= 0 && Integer.valueOf(post.getPrice())<=Integer.valueOf(text)){
+                            filterList.add(post);
+                        }
+                    }
+                }
+                //if you serach price without $ or ₪
+                else if(Integer.valueOf(post.getPrice())>= 0 && Integer.valueOf(post.getPrice())<=Integer.valueOf(text)){
+                        filterList.add(post);
+                }
+            }
+
         }
         if(!filterList.isEmpty()){
             postAdapter.setFilter(filterList);
