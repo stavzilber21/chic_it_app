@@ -2,6 +2,7 @@ package com.example.chic_it_app.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,12 +12,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.chic_it_app.CreatingcontentActivity;
+import com.example.chic_it_app.Fragments.HomeFragment;
 import com.example.chic_it_app.Fragments.PostDetailFragment;
+import com.example.chic_it_app.LoginActivity;
 import com.example.chic_it_app.MainActivity;
 import com.example.chic_it_app.Model.User;
+import com.example.chic_it_app.PostActivity;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -36,7 +44,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
 
     private Context mContext;
     private List<Post> mPosts;
-
     private FirebaseUser firebaseUser;
 
     public PostAdapter(Context mContext, List<Post> mPosts) {
@@ -137,6 +144,51 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
             }
         });
 
+        holder.delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
+                if (FirebaseDatabase.getInstance().getReference().child("Posts")
+                        .child(post.getPostid()).child(post.getPublisher()).getKey().equals(fUser.getUid())) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                    builder.setCancelable(true);
+                    builder.setTitle("you sure that you want to delete?");
+                    builder.setMessage("");
+                    builder.setPositiveButton("yes", (dialog, which) ->
+                    {
+                        FirebaseDatabase.getInstance().getReference().child("Posts")
+                                .child(post.getPostid()).removeValue()
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            Toast.makeText(mContext, "deleted!", Toast.LENGTH_SHORT).show();
+//                                        Toast.makeText(mContext.getApplicationContext(), "deleted!", Toast.LENGTH_SHORT).show();
+//                                        Intent intent = new Intent(Intent.ACTION_VIEW);
+//                                        intent.getClass();
+//                                        mContext.startActivity(intent);
+//                                        return;
+                                        }
+
+                                    }
+
+                                });
+                    });
+
+                    builder.setNegativeButton("no", (dialog, which) ->
+                    {
+                        Toast.makeText(mContext, "The post was not deleted!", Toast.LENGTH_SHORT).show();
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+
+                } else {
+                    Toast.makeText(mContext, "YOU CANT!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+
         holder.imageProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -192,6 +244,38 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
         holder.contact_us.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
+                String[] user_phone = new String[1];
+                FirebaseDatabase.getInstance().getReference().child("Users").child(post.getPublisher()).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        User user = dataSnapshot.getValue(User.class);
+                        user_phone[0] = user.getPhone();
+
+                        String a = "https://wa.me/";
+                        String b = "?text=Hi! I'm from chic it, I want ask you about your look " + post.getDescription();
+                        String Url = a+user_phone[0]+b;
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setData(Uri.parse(Url));
+                        mContext.startActivity(intent);
+
+
+                        }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+//                String user_id  = FirebaseDatabase.getInstance().getReference().child("Posts")
+//                        .child(post.getPostid()).child(post.getPublisher()).getKey();
+//
+//                String user_phone = FirebaseDatabase.getInstance().getReference().child("Users").child(user_id).child("phone").getKey().;
+//                String a = "https://wa.me/";
+//                String b = "?text=from chic it";
+//                String Url = a+user_phone+b;
+//                Intent intent = new Intent(Intent.ACTION_VIEW);
+//                intent.setData(Uri.parse(Url));
+//                mContext.startActivity(intent);
 
             }
         });
@@ -206,11 +290,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
     public class Viewholder extends RecyclerView.ViewHolder {
 
         public ImageView imageProfile;
+        public ImageView delete;
+
         public ImageView postImage;
         //        public ImageView like;
         public ImageView save;
 //        public ImageView comment;
-        public ImageView more;
+//        public ImageView more;
 
         public TextView username;
         public TextView contact_us;
@@ -230,7 +316,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
 //            like = itemView.findViewById(R.id.like);
 //            comment = itemView.findViewById(R.id.comment);
             save = itemView.findViewById(R.id.save);
-            more = itemView.findViewById(R.id.more);
+            delete = itemView.findViewById(R.id.delete);
+
+//            more = itemView.findViewById(R.id.more);
 
             username = itemView.findViewById(R.id.username);
             contact_us = itemView.findViewById(R.id.contact_us);
@@ -325,5 +413,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
 //        map.put("isPost", true);
 //
 //        FirebaseDatabase.getInstance().getReference().child("Notifications").child(firebaseUser.getUid()).push().setValue(map);
-    }
+//}
 
+}

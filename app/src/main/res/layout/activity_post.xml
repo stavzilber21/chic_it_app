@@ -90,24 +90,6 @@
             android:layout_marginTop="15dp"
             android:hint="Choose goal:" />
 
-        <Spinner
-            android:id="@+id/gender"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:hint="Choose goal:" />
-
-
-        <Button
-            android:id="@+id/add_details"
-            android:layout_width="156dp"
-            android:layout_height="54dp"
-            android:layout_marginTop="15dp"
-            android:background="@drawable/edittext_background"
-            android:text="ADD DETAILS"
-            android:layout_gravity="center"
-            android:textColor="@color/black" />
-
 
     </LinearLayout>
 
