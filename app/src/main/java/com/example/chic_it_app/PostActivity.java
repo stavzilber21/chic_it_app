@@ -11,8 +11,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.MimeTypeMap;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.tasks.Continuation;
@@ -28,7 +31,7 @@ import com.google.firebase.storage.StorageTask;
 import java.util.HashMap;
 
 
-public class PostActivity extends AppCompatActivity {
+public class PostActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
     ImageView close;
     ImageView imageAdded;
     Uri imageUri;
@@ -39,6 +42,9 @@ public class PostActivity extends AppCompatActivity {
     EditText store;
     EditText price;
     TextView post;
+    Spinner type;
+    String[] types={"inspiration","For rent - used","For rent - new","For sale - new","For sale - used"};
+    String choose;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +56,7 @@ public class PostActivity extends AppCompatActivity {
         description = findViewById(R.id.description);
         store = findViewById(R.id.store);
         price = findViewById(R.id.price);
+        type = (Spinner) findViewById(R.id.typeSpinner);
 
 
         close.setOnClickListener(new View.OnClickListener() {
@@ -74,6 +81,32 @@ public class PostActivity extends AppCompatActivity {
                 uploadImage();
             }
         });
+
+        type.setOnItemSelectedListener(this);
+
+        //Creating the ArrayAdapter instance having the bank name list
+        ArrayAdapter aa = new ArrayAdapter(this,android.R.layout.simple_spinner_item,types);
+        aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        //Setting the ArrayAdapter data on the Spinner
+        type.setAdapter(aa);
+
+    }
+
+    //Performing action onItemSelected and onNothing selected
+    @Override
+    public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {
+        choose = types[position];
+//        HashMap<String, Object> map = new HashMap<>();
+//        map.put("type", types[position]);
+//        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts");
+//        String postId = ref.push().getKey();
+//        ref.child(postId).setValue(map);
+//        Toast.makeText(getApplicationContext(), types[position], Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> arg0) {
+// TODO Auto-generated method stub
 
     }
 
@@ -111,6 +144,7 @@ public class PostActivity extends AppCompatActivity {
                     map.put("description" , description.getText().toString());
                     map.put("store" , store.getText().toString());
                     map.put("price" , price.getText().toString());
+                    map.put("type", choose);
                     map.put("publisher" , FirebaseAuth.getInstance().getCurrentUser().getUid());
 
                     ref.child(postId).setValue(map);
@@ -159,7 +193,7 @@ public class PostActivity extends AppCompatActivity {
             Toast.makeText(this, "Try again!", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(PostActivity.this , CreatingcontentActivity.class));
             finish();
+            }
         }
-    }
 
 }

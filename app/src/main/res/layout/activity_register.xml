@@ -52,6 +52,19 @@
         android:id="@+id/password"
         android:padding="10dp"/>
 
+
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_background"
+        android:hint="Phone (with 972, without 0, just numbers)"
+        android:layout_marginTop="15dp"
+        android:inputType="textEmailAddress"
+        android:id="@+id/phone"
+        android:padding="10dp"/>
+
+
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

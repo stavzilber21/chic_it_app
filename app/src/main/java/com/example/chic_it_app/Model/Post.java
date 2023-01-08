@@ -8,17 +8,19 @@ public class Post {
     private String imageurl;
     private String postid;
     private String publisher;
+    private String type;
 
     public Post() {
     }
 
-    public Post(String description, String imageurl, String postid, String publisher,String store, String price) {
+    public Post(String description, String imageurl, String postid, String publisher,String store, String price,String type) {
         this.description = description;
         this.imageurl = imageurl;
         this.postid = postid;
         this.publisher = publisher;
         this.store = store;
         this.price = price;
+        this.type = type;
     }
 
     public String getDescription() {
@@ -67,5 +69,13 @@ public class Post {
 
     public void setPrice(String price) {
         this.price = price;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

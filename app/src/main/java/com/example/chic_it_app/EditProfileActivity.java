@@ -37,7 +37,11 @@ import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class EditProfileActivity extends AppCompatActivity {
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+
+public class EditProfileActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
     private ImageView close;
     private CircleImageView imageProfile;
@@ -53,6 +57,9 @@ public class EditProfileActivity extends AppCompatActivity {
     private StorageTask uploadTask;
     private StorageReference storageRef;
 
+    String[] gender_opt ={"male","female"};
+    String[] size_opt ={"s","m"};
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,10 +72,30 @@ public class EditProfileActivity extends AppCompatActivity {
         changePhoto = findViewById(R.id.change_photo);
         fullname = findViewById(R.id.fullname);
         username = findViewById(R.id.username);
-//        bio = findViewById(R.id.bio);
 
         fUser = FirebaseAuth.getInstance().getCurrentUser();
         storageRef = FirebaseStorage.getInstance().getReference().child("Uploads");
+//        bio = findViewById(R.id.bio);
+
+        Spinner spin = (Spinner) findViewById(R.id.gender);
+        spin.setOnItemSelectedListener(this);
+
+        //Creating the ArrayAdapter instance having the bank name list
+        ArrayAdapter aa = new ArrayAdapter(this,android.R.layout.simple_spinner_item, gender_opt);
+        aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        //Setting the ArrayAdapter data on the Spinner
+        spin.setAdapter(aa);
+
+        Spinner spin2 = (Spinner) findViewById(R.id.size);
+        spin2.setOnItemSelectedListener(this);
+
+        //Creating the ArrayAdapter instance having the bank name list
+        ArrayAdapter bb = new ArrayAdapter(this,android.R.layout.simple_spinner_item, size_opt);
+        bb.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        //Setting the ArrayAdapter data on the Spinner
+        spin2.setAdapter(bb);
+
+
 
         FirebaseDatabase.getInstance().getReference().child("Users").child(fUser.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
@@ -118,10 +145,34 @@ public class EditProfileActivity extends AppCompatActivity {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String text = spin.getSelectedItem().toString();
+                String text_size = spin2.getSelectedItem().toString();
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("gender", text);
+                map.put("size", text_size);
+                FirebaseDatabase.getInstance().getReference().child("Users").child(fUser.getUid()).updateChildren(map);
                 updateProfile();
                 finish();
             }
         });
+
+
+    }
+    //Performing action onItemSelected and onNothing selected
+    @Override
+    public void onItemSelected(AdapterView<?> arg0, View arg1, int position,long id) {
+//        HashMap<String, Object> map = new HashMap<>();
+//        map.put("gender", gender_opt[position]);
+//        map.put("bio", bio.getText().toString());.
+
+//        FirebaseDatabase.getInstance().getReference().child("Users").child(fUser.getUid()).updateChildren(map);
+//        Toast.makeText(getApplicationContext(), gender_opt[position], Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> arg0) {
+        // TODO Auto-generated method stub
+
     }
 
     private void updateProfile() {

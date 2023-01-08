@@ -83,6 +83,14 @@
             android:hint="price"
             android:maxLines="5" />
 
+        <Spinner
+            android:id="@+id/typeSpinner"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:hint="Choose goal:" />
+
+
     </LinearLayout>
 
 </LinearLayout>
