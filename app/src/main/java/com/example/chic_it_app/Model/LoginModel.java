@@ -24,6 +24,8 @@ public class LoginModel {
     private Activity activity;
     DatabaseReference reference;
 
+//    Login
+
     public LoginModel(Activity activity) {
         this.activity = activity;
 
