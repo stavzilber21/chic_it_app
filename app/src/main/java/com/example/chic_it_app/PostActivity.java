@@ -96,12 +96,6 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {
         choose = types[position];
-//        HashMap<String, Object> map = new HashMap<>();
-//        map.put("type", types[position]);
-//        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts");
-//        String postId = ref.push().getKey();
-//        ref.child(postId).setValue(map);
-//        Toast.makeText(getApplicationContext(), types[position], Toast.LENGTH_LONG).show();
     }
 
     @Override
