@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -163,7 +164,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()) {
                                             Toast.makeText(mContext, "deleted!", Toast.LENGTH_SHORT).show();
-//                                        Toast.makeText(mContext.getApplicationContext(), "deleted!", Toast.LENGTH_SHORT).show();
+                                            HomeFragment homeFragment = new HomeFragment();
+                                            homeFragment.count_post();
+                                            //    Toast.makeText(mContext.getApplicationContext(), "deleted!", Toast.LENGTH_SHORT).show();
 //                                        Intent intent = new Intent(Intent.ACTION_VIEW);
 //                                        intent.getClass();
 //                                        mContext.startActivity(intent);
@@ -259,7 +262,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
                         mContext.startActivity(intent);
 
 
-                        }
+                    }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {

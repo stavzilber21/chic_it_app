@@ -83,13 +83,13 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         {
             Toast.makeText(MainActivity.this, "bye-bye!", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(MainActivity.this , LoginActivity.class));
-                    });
+        });
 
         builder.setNegativeButton("no", (dialog, which) ->
         {
             Toast.makeText(MainActivity.this, "good to have you back!", Toast.LENGTH_SHORT).show();
 //            startActivity(new Intent(MainActivity.this , MainActivity.class));
-            });
+        });
         AlertDialog dialog = builder.create();
         dialog.show();
 

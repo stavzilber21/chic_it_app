@@ -193,7 +193,7 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
             Toast.makeText(this, "Try again!", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(PostActivity.this , CreatingcontentActivity.class));
             finish();
-            }
         }
+    }
 
 }
