@@ -32,7 +32,6 @@ public class RegisterActivity extends AppCompatActivity {
     EditText username, fullname, email, password, phone;
     Button register;
     TextView txt_login;
-
     FirebaseAuth auth;
     DatabaseReference reference;
     ProgressDialog pd;
@@ -52,6 +51,7 @@ public class RegisterActivity extends AppCompatActivity {
         txt_login = findViewById(R.id.txt_login);
 
         auth = FirebaseAuth.getInstance();
+
         //if I already register to application
         txt_login.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,8 +68,7 @@ public class RegisterActivity extends AppCompatActivity {
                 builder.setCancelable(true);
                 builder.setTitle("You have been contacted via your phone");
                 builder.setMessage("");
-                builder.setPositiveButton("Confirm", (dialog, which) ->
-                {
+                builder.setPositiveButton("Confirm", (dialog, which) -> {
                     pd = new ProgressDialog(RegisterActivity.this);
                     //to display the progress of an action that is loading.
                     pd.setMessage("Please wait...");
@@ -94,14 +93,11 @@ public class RegisterActivity extends AppCompatActivity {
                     }
                 });
 
-                builder.setNegativeButton("Deny", (dialog, which) ->
-                {
+                builder.setNegativeButton("Deny", (dialog, which) -> {
                     Toast.makeText(RegisterActivity.this, "You will not be able to enter the application!", Toast.LENGTH_SHORT).show();
                 });
                 AlertDialog dialog = builder.create();
                 dialog.show();
-
-
             }
         });
 

@@ -7,7 +7,6 @@ public class User {
     private String fullname;
     private String email;
     private String username;
-    //    private String bio;
     private String imageurl;
     private String id;
     private String gender;
@@ -21,7 +20,6 @@ public class User {
         this.fullname = name;
         this.email = email;
         this.username = username;
-//        this.bio = bio;
         this.imageurl = imageurl;
         this.id = id;
         this.gender = gender;
@@ -51,8 +49,6 @@ public class User {
     public void setUsername(String username) {
         this.username = username;
     }
-
-
 
     public String getImageurl() {
         return imageurl;

@@ -9,26 +9,16 @@ import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.text.Editable;
-import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.Toast;
-
 import com.example.chic_it_app.Adapter.PostAdapter;
 import com.example.chic_it_app.Model.Post;
-import com.example.chic_it_app.UserActivity;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-//import com.example.chic_it_app.Adapter.UserAdapter;
 import com.example.chic_it_app.R;
 
 import java.util.ArrayList;
@@ -41,7 +31,6 @@ public class SearchFragment extends Fragment {
     private List<Post> mPosts;
     private PostAdapter postAdapter;
     private SearchView searchView;
-//    private EditText search_bar;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -56,8 +45,6 @@ public class SearchFragment extends Fragment {
         mPosts = new ArrayList<>();
         postAdapter = new PostAdapter(getContext() , mPosts);
         recyclerView.setAdapter(postAdapter);
-
-//        search_bar = view.findViewById(R.id.search_bar);
         searchView = view.findViewById(R.id.searchView);
         searchView.clearFocus();
         readPosts();
@@ -73,24 +60,6 @@ public class SearchFragment extends Fragment {
                 return true;
             }
         });
-
-
-//        search_bar.addTextChangedListener(new TextWatcher() {
-//            @Override
-//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-//
-//            }
-//
-//            @Override
-//            public void onTextChanged(CharSequence s, int start, int before, int count) {
-//                searchPost(s.toString());
-//            }
-//
-//            @Override
-//            public void afterTextChanged(Editable s) {
-//            }
-//        });
-
         return view;
     }
 
@@ -119,60 +88,20 @@ public class SearchFragment extends Fragment {
 
     }
 
-    //    private void searchPost (String s) {
-//
-//        Query query = FirebaseDatabase.getInstance().getReference().child("Posts")
-//                .orderByChild("description").startAt(s).endAt(s + "\uf8ff");
-//
-//        query.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                mPosts.clear();
-//                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-//                    Post post = snapshot.getValue(Post.class);
-//                    mPosts.add(post);
-//                }
-//                postAdapter.notifyDataSetChanged();
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
-//    }
     private void filterPost(String text) {
         List<Post> filterList = new ArrayList<>();
-//        double Price = 0.0;
         for(Post post : mPosts){
             if(post.getDescription().contains(text) || post.getStore().contains(text) ){
                 filterList.add(post);
             }
-            //if you search range of prices
             else if(text.contains("-") && text.indexOf("-")!=text.length()-1){
                 if(text.endsWith("$")){
                     String text_new = text.replace("$","");
                     text = text_new;
-//                    if(post.getPrice().endsWith("$")){
-//                        String pr =post.getPrice().replace("$","");
-//                        Price = Double.parseDouble(pr);
-//                    }
-//                    if(post.getPrice().endsWith("₪")){
-//                        String pr =post.getPrice().replace("₪","");
-//                        Price = Double.parseDouble(pr)/3.25; //convert to dollar
-//                    }
                 }
                 if(text.endsWith("₪")){
                     String text_new = text.replace("₪","");
                     text = text_new;
-//                    if(post.getPrice().endsWith("$")){
-//                        String pr =post.getPrice().replace("$","");
-//                        Price = Double.parseDouble(pr)*3.25; //convert to shekel
-//                    }
-//                    if(post.getPrice().endsWith("₪")){
-//                        String pr =post.getPrice().replace("₪","");
-//                        Price = Double.parseDouble(pr);
-//                    }
                 }
                 int x = text.indexOf("-");
                 String first = text.substring(0,x);

@@ -102,9 +102,7 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
                 fullname.setText(user.getFullname());
-//                Toast.makeText(EditProfileActivity.this, user.getName(), Toast.LENGTH_SHORT).show();
                 username.setText(user.getUsername());
-//                bio.setText(user.getBio());
                 Picasso.get().load(user.getImageurl()).into(imageProfile);
             }
 
@@ -135,10 +133,7 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
         imageProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                imageProfile.setGridInnerMode(ImageCropView.GRID_ON);
-//                imageProfile.setGridOuterMode(ImageCropView.GRID_ON);
-//                ImageCropView.
-//                CropImage.activity().setCropShape(CropImageView.CropShape.OVAL).start(EditProfileActivity.this);
+
             }
         });
 
@@ -161,12 +156,7 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
     //Performing action onItemSelected and onNothing selected
     @Override
     public void onItemSelected(AdapterView<?> arg0, View arg1, int position,long id) {
-//        HashMap<String, Object> map = new HashMap<>();
-//        map.put("gender", gender_opt[position]);
-//        map.put("bio", bio.getText().toString());.
 
-//        FirebaseDatabase.getInstance().getReference().child("Users").child(fUser.getUid()).updateChildren(map);
-//        Toast.makeText(getApplicationContext(), gender_opt[position], Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -179,8 +169,6 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
         HashMap<String, Object> map = new HashMap<>();
         map.put("fullname", fullname.getText().toString());
         map.put("username", username.getText().toString());
-//        map.put("bio", bio.getText().toString());.
-
         FirebaseDatabase.getInstance().getReference().child("Users").child(fUser.getUid()).updateChildren(map);
     }
 

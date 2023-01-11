@@ -30,7 +30,8 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         user = (Button) findViewById(R.id.user);
         creating_content = (Button) findViewById(R.id.creating_content);
         more = (ImageView) findViewById(R.id.more);
-        //to connect the buttoms to xml file
+
+        //to connect the buttons to xml file
         user.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -45,12 +46,9 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             }
         });
 
-        more.setOnClickListener(new View.OnClickListener()
-        {
+        more.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-
                 showPopup(v);
-
             }
         });
 
@@ -64,16 +62,6 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         popup.setOnMenuItemClickListener(MainActivity.this);
     }
 
-    public void showMenu(View v) {
-        PopupMenu popup = new PopupMenu(this, v);
-
-        // This activity implements OnMenuItemClickListener
-        popup.setOnMenuItemClickListener((PopupMenu.OnMenuItemClickListener) this);
-        popup.inflate(R.menu.main_menu);
-        popup.show();
-    }
-
-
     public void dialog_exit(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setCancelable(true);
@@ -85,10 +73,8 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             startActivity(new Intent(MainActivity.this , LoginActivity.class));
         });
 
-        builder.setNegativeButton("no", (dialog, which) ->
-        {
+        builder.setNegativeButton("no", (dialog, which) -> {
             Toast.makeText(MainActivity.this, "good to have you back!", Toast.LENGTH_SHORT).show();
-//            startActivity(new Intent(MainActivity.this , MainActivity.class));
         });
         AlertDialog dialog = builder.create();
         dialog.show();
@@ -109,10 +95,4 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         }
         return  true;
     }
-
-
-
-
-
-
 }
