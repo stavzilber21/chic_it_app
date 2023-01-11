@@ -4,19 +4,11 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import com.example.chic_it_app.Model.HomeModel;
-import com.example.chic_it_app.Model.RegisterModel;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import java.lang.reflect.Type;
-import androidx.annotation.NonNull;
+
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.text.Editable;
-import android.text.TextUtils;
-import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,24 +22,12 @@ import com.android.volley.toolbox.Volley;
 import com.example.chic_it_app.Adapter.PostAdapter;
 import com.example.chic_it_app.Model.Post;
 import com.example.chic_it_app.R;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 
 public class HomeFragment extends Fragment {
@@ -57,6 +37,7 @@ public class HomeFragment extends Fragment {
     private PostAdapter postAdapter;
     private TextView count_post;
 
+    //called to inflate the layout of the fragment
     @SuppressLint("MissingInflatedId")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -76,7 +57,11 @@ public class HomeFragment extends Fragment {
 
         return view;
     }
-
+/*
+A function where we worked with the server. That is, the lock is on the server and the rest of the code is here.
+The function actually holds a variable that stores the number of posts.
+And when we click on the home screen, we can see the amount.
+ */
     public void count_post()
     {
         RequestQueue volleyQueue = Volley.newRequestQueue(getContext());

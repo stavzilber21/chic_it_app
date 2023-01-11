@@ -1,5 +1,5 @@
 package com.example.chic_it_app;
-//import android.support.v7.app.AppCompatActivity;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -53,15 +53,17 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         });
 
     }
-
-    private void showPopup(View v) {
+    /*When the user clicks, the posts appear over the application in a
+     vertical orientation while the user is clicking an item, and then they disappear from the screen.*/
+    private void showPopup(View v)
+    {
         PopupMenu popup = new PopupMenu(this, v);
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.main_menu, popup.getMenu());
         popup.show();
         popup.setOnMenuItemClickListener(MainActivity.this);
     }
-
+//dialog that ask the user befor he click.
     public void dialog_exit(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setCancelable(true);

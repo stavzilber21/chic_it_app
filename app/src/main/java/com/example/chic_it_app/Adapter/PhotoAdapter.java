@@ -15,22 +15,24 @@ import com.example.chic_it_app.Fragments.PostDetailFragment;
 import com.example.chic_it_app.Model.Post;
 import com.example.chic_it_app.R;
 import com.squareup.picasso.Picasso;
-
 import java.util.List;
 
-public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> {
+public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>
+{
 
-    private Context mContext;
-    private List<Post> mPosts;
+    private Context mContext; // the post
+    private List<Post> mPosts; // list of all the posts
 
-    public PhotoAdapter(Context mContext, List<Post> mPosts) {
-        this.mContext = mContext;
+    public PhotoAdapter(Context mContext, List<Post> mPosts) //post and list of posts
+    {
+        this.mContext = mContext; // enter the data
         this.mPosts = mPosts;
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
+    {
         View view = LayoutInflater.from(mContext).inflate(R.layout.photo_item, parent, false);
         return  new PhotoAdapter.ViewHolder(view);
     }

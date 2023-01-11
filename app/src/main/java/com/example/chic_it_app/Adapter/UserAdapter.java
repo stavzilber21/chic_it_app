@@ -1,6 +1,4 @@
 package com.example.chic_it_app.Adapter;
-
-
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -24,12 +22,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-//import com.rishav.firebasedemo.Fragments.ProfileFragment;
-//import com.rishav.firebasedemo.MainActivity;
-//import com.rishav.firebasedemo.Model.User;
-//import com.rishav.firebasedemo.R;
 import com.squareup.picasso.Picasso;
-
 import java.util.HashMap;
 import java.util.List;
 
@@ -40,30 +33,29 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>{
     private Context mContext;
     private List<User> mUsers;
     private boolean isFargment;
-
     private FirebaseUser firebaseUser;
 
-    public UserAdapter(Context mContext, List<User> mUsers, boolean isFargment) {
+    // function to enter the data
+    public UserAdapter(Context mContext, List<User> mUsers, boolean isFargment)
+    {
         this.mContext = mContext;
         this.mUsers = mUsers;
         this.isFargment = isFargment;
     }
-
-    @NonNull
+/*to create instances of a ViewHolder , including working with the ViewHolder to set up the widgets.
+Since our widgets are defined in a layout resource, we will need a LayoutInflater to accomplish this*/
+  @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.user_item , parent , false);
         return new UserAdapter.ViewHolder(view);
     }
-
+//to display the data at the specified position.
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
-
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-
         final User user = mUsers.get(position);
         holder.btnFollow.setVisibility(View.VISIBLE);
-
         holder.username.setText(user.getUsername());
         holder.fullname.setText(user.getFullname());
 
@@ -74,7 +66,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>{
         if (user.getId().equals(firebaseUser.getUid())){
             holder.btnFollow.setVisibility(View.GONE);
         }
-
+/*
+ executes a certain functionality when a button is clicked.
+ */
         holder.btnFollow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -140,13 +134,15 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>{
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
-
+        //the data for user that connect to chic _it
         public CircleImageView imageProfile;
         public TextView username;
         public TextView fullname;
         public Button btnFollow;
 
-        public ViewHolder(@NonNull View itemView) {
+        //describes an item view and metadata about its place within the RecyclerView.
+        public ViewHolder(@NonNull View itemView)
+        {
             super(itemView);
 
             imageProfile = itemView.findViewById(R.id.image_profile);
@@ -155,7 +151,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>{
             btnFollow = itemView.findViewById(R.id.btn_follow);
         }
     }
-
+//add the data to hashmap - save data
     private void addNotification(String userId) {
         HashMap<String, Object> map = new HashMap<>();
 
