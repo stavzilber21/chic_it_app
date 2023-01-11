@@ -1,4 +1,4 @@
-# *chic_it_app*        👠👗🩳👕👚                          
+[![Typing SVG](https://readme-typing-svg.herokuapp.com/?lines=👋+Welcome+to+chic_it_app!)](https://git.io/typing-svg)                            
 ![logo (1)](https://user-images.githubusercontent.com/93703549/211910526-5bb40156-72f2-46cf-8f81-8db1f87938dd.png)
 
 # About Us...💁🏼‍♀️
