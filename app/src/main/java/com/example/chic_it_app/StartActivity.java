@@ -35,14 +35,14 @@ public class StartActivity extends AppCompatActivity {
         //to connect the buttons to xml file
         login = findViewById(R.id.login);
         register = findViewById(R.id.register);
-
+        //if the user is alredy exist
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(StartActivity.this, LoginActivity.class));
             }
         });
-
+        //if the user is not  exist
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

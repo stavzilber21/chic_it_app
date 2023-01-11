@@ -60,7 +60,7 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
             }
         });
-
+        //the user already exists in the system, we will take the username and password and send it to the LoginModel class
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

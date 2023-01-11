@@ -109,7 +109,7 @@ public class ProfileFragment extends Fragment {
         } else {
 //            checkFollowingStatus();
         }
-
+        //if the user click on the editProfile icon we transfer him to the EditProfileActivity class
         editProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -122,6 +122,7 @@ public class ProfileFragment extends Fragment {
         recyclerView.setVisibility(View.VISIBLE);
         recyclerViewLikes.setVisibility(View.GONE);
 
+        //if the user click on the myPictures icon  we Present him the list of the posts he uploads
         myPictures.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -129,7 +130,7 @@ public class ProfileFragment extends Fragment {
                 recyclerViewLikes.setVisibility(View.GONE);
             }
         });
-
+        //if the user click on the savedPictures icon  we Present him the list of the posts he saved
         savedPictures.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -142,26 +143,6 @@ public class ProfileFragment extends Fragment {
 
 
 
-
-//    private void checkFollowingStatus() {
-//
-//        FirebaseDatabase.getInstance().getReference().child("Follow").child(fUser.getUid()).child("following").addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                if (dataSnapshot.child(profileId).exists()) {
-//                    editProfile.setText("following");
-//                } else {
-//                    editProfile.setText("follow");
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
-//
-//    }
 
 
 

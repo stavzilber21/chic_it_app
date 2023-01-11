@@ -67,7 +67,9 @@ public class SearchFragment extends Fragment {
     }
 
 
-
+        /*A user enters a search word (can be a description, price range, etc.)
+         We go through all the posts and each post that meets the feature the user was looking for we put in the list,
+          finally we will show him all the appropriate posts*/
     private void filterPost(String text) {
         List<Post> filterList = new ArrayList<>();
         for(Post post : mPosts){

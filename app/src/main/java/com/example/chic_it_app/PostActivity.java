@@ -59,7 +59,6 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
         price = findViewById(R.id.price);
         type = (Spinner) findViewById(R.id.typeSpinner);
 
-
         close.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -67,7 +66,7 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
                 finish();
             }
         });
-
+        //to upload posts
         imageAdded.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -75,7 +74,7 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
                 selectImage();
             }
         });
-
+        // to post a post
         post.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

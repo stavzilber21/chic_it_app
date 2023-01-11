@@ -41,7 +41,6 @@ public class PostDetailFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_post_detail, container, false);
 
         postId = getContext().getSharedPreferences("PREFS", Context.MODE_PRIVATE).getString("postid", "none");
-
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -49,7 +48,6 @@ public class PostDetailFragment extends Fragment {
         postList = new ArrayList<>();
         postAdapter = new PostAdapter(getContext(), postList);
         recyclerView.setAdapter(postAdapter);
-
         model.user_id(postId,postList,postAdapter);
 
 

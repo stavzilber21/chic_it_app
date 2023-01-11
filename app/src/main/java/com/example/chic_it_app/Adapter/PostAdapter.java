@@ -85,7 +85,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
                     Picasso.get().load(user.getImageurl()).placeholder(R.mipmap.ic_launcher).into(holder.imageProfile);
                 }
                 holder.username.setText(user.getUsername());
-//                holder.author.setText(user.getFullname());
             }
 
             @Override
@@ -94,7 +93,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
             }
         });
         isSaved(post.getPostid(), holder.save);
-
+       //change the fild in the fire base
         holder.save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -107,7 +106,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
                 }
             }
         });
-
+        /* if toy click on the delete icon we check if it is your post, If it's a post you uploaded, we make sure the user really
+         wants to delete the post, and if so, we remove it from Firefox*/
         holder.delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -149,7 +149,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
             }
         });
 
-
+        /*If a user clicks on the button imageProfile we display the profile picture*/
         holder.imageProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -160,7 +160,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
                         .replace(R.id.fragment_container, new ProfileFragment()).commit();
             }
         });
-
+        /*If a user clicks on the button username we display the profile picture*/
         holder.username.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -171,7 +171,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
                         .replace(R.id.fragment_container, new ProfileFragment()).commit();
             }
         });
-
+        /*If a user clicks on the button postImage we display the profile picture*/
         holder.postImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -181,7 +181,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
                         .replace(R.id.fragment_container, new PostDetailFragment()).commit();
             }
         });
-
+        /* If a user clicks on the button contact_us we send it to that seller's WhatsApp*/
         holder.contact_us.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
@@ -235,7 +235,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
 
         public Viewholder(@NonNull View itemView) {
             super(itemView);
-
+            //take all the varbiale ftom the xml
             imageProfile = itemView.findViewById(R.id.image_profile);
             postImage = itemView.findViewById(R.id.post_image);
             save = itemView.findViewById(R.id.save);
@@ -249,7 +249,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
 
         }
     }
-
+    /*when you click on sava icon we check if the picture is alredy seved, if it wasnt save before we change the
+        icon to be full and add it to the List of saved posts, if it is not the first time we change the icon and we remov
+        it from the List of saved posts*/
     private void isSaved (final String postId, final ImageView image) {
         FirebaseDatabase.getInstance().getReference().child("Saves").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
             @Override

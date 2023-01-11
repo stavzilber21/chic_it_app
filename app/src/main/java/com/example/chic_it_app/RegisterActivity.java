@@ -81,6 +81,7 @@ public class RegisterActivity extends AppCompatActivity {
                     String str_password = password.getText().toString();
                     String str_phone = phone.getText().toString();
 
+                    // check if the input is write correctly
                     if (TextUtils.isEmpty(str_username) || TextUtils.isEmpty(str_fullname)
                             || TextUtils.isEmpty(str_email) ||TextUtils.isEmpty(str_password) || TextUtils.isEmpty(str_phone)) {
                         Toast.makeText(RegisterActivity.this, "All fields are required!", Toast.LENGTH_SHORT).show();
@@ -116,6 +117,7 @@ public class RegisterActivity extends AppCompatActivity {
                             // to create sub tree in firebase ti Users
                             reference = FirebaseDatabase.getInstance().getReference().child("Users").child(userid);
 
+                            //we add the valur to HashMap and Present it to the user
                             HashMap<String, Object> hashMap = new HashMap<>();
                             hashMap.put("id", userid);
                             hashMap.put("username", username.toLowerCase());

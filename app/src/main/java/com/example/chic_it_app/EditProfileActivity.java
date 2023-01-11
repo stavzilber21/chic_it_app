@@ -98,7 +98,6 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
         //Setting the ArrayAdapter data on the Spinner
         spin2.setAdapter(bb);
 
-
         model.firebase_username(fUser,fullname,username,imageProfile);
 
 
