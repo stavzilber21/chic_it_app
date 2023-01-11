@@ -17,6 +17,8 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.chic_it_app.Model.LoginModel;
+import com.example.chic_it_app.Model.RegisterModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -34,7 +36,7 @@ import org.json.JSONException;
 import java.util.EventListener;
 
 public class LoginActivity extends AppCompatActivity {
-
+    LoginModel model = new LoginModel(this);
     EditText email, password;
     Button login;
     TextView txt_signup;
@@ -68,40 +70,8 @@ public class LoginActivity extends AppCompatActivity {
 
                 String str_email = email.getText().toString();
                 String str_password = password.getText().toString();
+                model.login(str_email,str_password,auth,pd);
 
-                if(TextUtils.isEmpty(str_email) || TextUtils.isEmpty(str_password)) {
-                    Toast.makeText(LoginActivity.this, "All fiels are required!", Toast.LENGTH_SHORT).show();
-                } else {
-                    auth.signInWithEmailAndPassword(str_email, str_password)
-                            .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
-                                @Override
-                                public void onComplete(@NonNull Task<AuthResult> task) {
-                                    if(task.isSuccessful()) {
-                                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Users")
-                                                .child(auth.getCurrentUser().getUid());
-
-                                        reference.addValueEventListener(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                pd.dismiss();
-                                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                                startActivity(intent);
-                                                finish();
-                                            }
-
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError error) {
-                                                pd.dismiss();
-                                            }
-                                        });
-                                    } else {
-                                        pd.dismiss();
-                                        Toast.makeText(LoginActivity.this, "Authenication failed!", Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            });
-                }
             }
         });
     }

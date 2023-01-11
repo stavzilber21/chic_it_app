@@ -25,7 +25,6 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.chic_it_app.Adapter.PostAdapter;
-import com.example.chic_it_app.Api.RetrofitClient;
 import com.example.chic_it_app.Model.Post;
 import com.example.chic_it_app.R;
 import com.google.firebase.database.DataSnapshot;
