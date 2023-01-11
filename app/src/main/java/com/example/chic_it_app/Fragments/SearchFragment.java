@@ -107,8 +107,6 @@ public class SearchFragment extends Fragment {
                     Post post = snapshot.getValue(Post.class);
                     mPosts.add(post);
                     Collections.reverse(mPosts);
-
-
                     postAdapter.notifyDataSetChanged();
                 }
             }
@@ -218,7 +216,7 @@ public class SearchFragment extends Fragment {
                 }
                 //if you serach price without $ or ₪
                 else if(Integer.valueOf(post.getPrice())>= 0 && Integer.valueOf(post.getPrice())<=Integer.valueOf(text)){
-                        filterList.add(post);
+                    filterList.add(post);
                 }
             }
 
