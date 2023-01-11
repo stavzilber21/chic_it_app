@@ -14,6 +14,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.chic_it_app.Model.HomeModel;
+import com.example.chic_it_app.Model.PostDetailModel;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
@@ -26,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PostDetailFragment extends Fragment {
-
+    PostDetailModel model = new PostDetailModel(this);
     private String postId;
     private RecyclerView recyclerView;
     private PostAdapter postAdapter;
@@ -48,20 +50,9 @@ public class PostDetailFragment extends Fragment {
         postAdapter = new PostAdapter(getContext(), postList);
         recyclerView.setAdapter(postAdapter);
 
-        FirebaseDatabase.getInstance().getReference().child("Posts").child(postId).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                postList.clear();
-                postList.add(dataSnapshot.getValue(Post.class));
+        model.user_id(postId,postList,postAdapter);
 
-                postAdapter.notifyDataSetChanged();
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
 
         return view;
     }

@@ -16,6 +16,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.chic_it_app.Model.EditProfileModel;
+import com.example.chic_it_app.Model.RegisterModel;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -42,6 +44,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 public class EditProfileActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
+    EditProfileModel model = new EditProfileModel(this);
 
     private ImageView close;
     private CircleImageView imageProfile;
@@ -54,7 +57,7 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
     private FirebaseUser fUser;
 
     private Uri mImageUri;
-    private StorageTask uploadTask;
+
     private StorageReference storageRef;
 
     String[] gender_opt ={"male","female"};
@@ -96,21 +99,8 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
         spin2.setAdapter(bb);
 
 
+        model.firebase_username(fUser,fullname,username,imageProfile);
 
-        FirebaseDatabase.getInstance().getReference().child("Users").child(fUser.getUid()).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
-                fullname.setText(user.getFullname());
-                username.setText(user.getUsername());
-                Picasso.get().load(user.getImageurl()).into(imageProfile);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
 
         close.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -130,22 +120,13 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
             }
         });
 
-        imageProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
 
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String text = spin.getSelectedItem().toString();
+                String text_gender = spin.getSelectedItem().toString();
                 String text_size = spin2.getSelectedItem().toString();
-                HashMap<String, Object> map = new HashMap<>();
-                map.put("gender", text);
-                map.put("size", text_size);
-                FirebaseDatabase.getInstance().getReference().child("Users").child(fUser.getUid()).updateChildren(map);
+                model.pust_gender_size(text_gender,text_size,fUser);
                 updateProfile();
                 finish();
             }
@@ -165,50 +146,14 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
 
     }
 
+
+
     private void updateProfile() {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("fullname", fullname.getText().toString());
-        map.put("username", username.getText().toString());
-        FirebaseDatabase.getInstance().getReference().child("Users").child(fUser.getUid()).updateChildren(map);
+        model.update_profile(fullname,username,fUser);
+
     }
 
-    private void uploadImage() {
-        //Upload image to firebase storage
-        final ProgressDialog pd = new ProgressDialog(this);
-        pd.setMessage("Uploading");
-        pd.show();
 
-        if (mImageUri != null) {
-            final StorageReference fileRef = storageRef.child(System.currentTimeMillis() + ".jpeg");
-
-            uploadTask = fileRef.putFile(mImageUri);
-            uploadTask.continueWithTask(new Continuation() {
-                @Override
-                public Object then(@NonNull Task task) throws Exception {
-                    if (!task.isSuccessful()) {
-                        throw task.getException();
-                    }
-
-                    return  fileRef.getDownloadUrl();
-                }
-            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-                @Override
-                public void onComplete(@NonNull Task<Uri> task) {
-                    if (task.isSuccessful()) {
-                        Uri downloadUri = task.getResult();
-                        String url = downloadUri.toString();
-
-                        FirebaseDatabase.getInstance().getReference().child("Users").child(fUser.getUid()).child("imageurl").setValue(url);
-                        pd.dismiss();
-                    } else {
-                        Toast.makeText(EditProfileActivity.this, "Upload failed!", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
-        } else {
-            Toast.makeText(this, "No image selected", Toast.LENGTH_SHORT).show();
-        }
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -218,7 +163,7 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
             if(resultCode == Activity.RESULT_OK){
                 mImageUri = data.getData();
                 imageProfile.setImageURI(mImageUri);
-                uploadImage();
+                model.uploadImage(mImageUri,storageRef,fUser);
             }
         }
         else {

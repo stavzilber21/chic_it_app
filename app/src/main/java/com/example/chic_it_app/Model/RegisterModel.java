@@ -30,7 +30,7 @@ public class RegisterModel {
     //connect to details of user to firebase
     public void register(final String username, final String fullname, String email, String password, String phone , FirebaseAuth auth, ProgressDialog pd){
         auth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(activity, new OnCompleteListener<AuthResult>() {
+                .addOnCompleteListener(activity, (OnCompleteListener<AuthResult>) new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {

@@ -13,7 +13,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import com.example.chic_it_app.Adapter.PostAdapter;
+import com.example.chic_it_app.Model.HomeModel;
 import com.example.chic_it_app.Model.Post;
+import com.example.chic_it_app.Model.SearchModel;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -26,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class SearchFragment extends Fragment {
+    SearchModel model = new SearchModel(this);
 
     private RecyclerView recyclerView;
     private List<Post> mPosts;
@@ -47,7 +50,7 @@ public class SearchFragment extends Fragment {
         recyclerView.setAdapter(postAdapter);
         searchView = view.findViewById(R.id.searchView);
         searchView.clearFocus();
-        readPosts();
+        model.readPosts(mPosts,postAdapter);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -64,29 +67,6 @@ public class SearchFragment extends Fragment {
     }
 
 
-
-    private void readPosts() {
-
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Posts");
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                mPosts.clear();
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
-                    Post post = snapshot.getValue(Post.class);
-                    mPosts.add(post);
-                    Collections.reverse(mPosts);
-                    postAdapter.notifyDataSetChanged();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-    }
 
     private void filterPost(String text) {
         List<Post> filterList = new ArrayList<>();
