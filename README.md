@@ -16,3 +16,5 @@ To "like" a post, this action adds this look to "looks I liked" and so it can be
 # Advantages we have..🙌
 Despite all the information on social networks on the Internet, our application gives a more accurate answer.
 You just have to scroll and that's how you are exposed to lots of looks that you can just go and buy.
+https://user-images.githubusercontent.com/93096648/212119599-4a5c5225-f2bb-4811-9afc-11e140d3e4a3.mp4
+
