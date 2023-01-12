@@ -29,7 +29,7 @@ import java.util.Collections;
 import java.util.List;
 
 
-
+/*This department is the "home page" of the application where you can view all existing posts.*/
 public class HomeFragment extends Fragment {
     HomeModel model = new HomeModel(this);
     private RecyclerView recyclerView;
@@ -53,6 +53,7 @@ public class HomeFragment extends Fragment {
         recyclerView.setAdapter(postAdapter);
 
         count_post();
+        //to call function from the model.
         model.readPosts(mPosts,postAdapter);
 
         return view;

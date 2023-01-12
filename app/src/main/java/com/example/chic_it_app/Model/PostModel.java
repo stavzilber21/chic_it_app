@@ -26,6 +26,8 @@ import com.google.firebase.storage.StorageTask;
 import java.util.HashMap;
 
 public class PostModel {
+    /*This class is the model of the "PostActivity" all the connection to Firebase is done through this class.*/
+
     private Activity activity;
     StorageReference storageReference;
     String imageUrl;
@@ -37,6 +39,7 @@ public class PostModel {
         this.activity = activity;
 
     }
+    //to upload the image in the firebase.
     public void uploadImage(Uri imageUri,EditText description,EditText store,EditText price,String choose) {
 
         progressDialog = new ProgressDialog(activity);

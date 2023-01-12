@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class SearchFragment extends Fragment {
+    //This class is when a user wants to search for posts by something specific.
     SearchModel model = new SearchModel(this);
 
     private RecyclerView recyclerView;
@@ -67,7 +68,9 @@ public class SearchFragment extends Fragment {
     }
 
 
-
+    /*This function filters the posts according to the user's request.
+    You can search by a certain description - such as an item of clothing or a specific store
+    and you can also search by price range.*/
     private void filterPost(String text) {
         List<Post> filterList = new ArrayList<>();
         for(Post post : mPosts){

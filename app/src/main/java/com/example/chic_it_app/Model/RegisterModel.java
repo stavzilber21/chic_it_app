@@ -20,6 +20,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.HashMap;
 
 public class RegisterModel {
+    /*This class is the model of the "RegisterActivity" all the connection to Firebase is done through this class.*/
     private Activity activity;
     DatabaseReference reference;
 
@@ -36,7 +37,7 @@ public class RegisterModel {
                         if (task.isSuccessful()) {
                             FirebaseUser firebaseUser = auth.getCurrentUser();
                             String userid = firebaseUser.getUid();
-                            // to create sub tree in firebase ti Users
+                            // to create sub tree in firebase to Users
                             reference = FirebaseDatabase.getInstance().getReference().child("Users").child(userid);
 
                             HashMap<String, Object> hashMap = new HashMap<>();

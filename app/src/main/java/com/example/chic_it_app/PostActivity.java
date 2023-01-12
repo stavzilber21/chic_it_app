@@ -35,6 +35,7 @@ import java.util.HashMap;
 
 
 public class PostActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
+    //Through this class you can upload a new post to the application.
     PostModel model = new PostModel(this);
     ImageView close;
     ImageView imageAdded;
@@ -105,6 +106,7 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
 
+    //to select picture from my phone
     private void selectImage() {
 
         Intent intent = new Intent();

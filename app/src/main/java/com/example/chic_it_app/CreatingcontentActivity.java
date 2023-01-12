@@ -13,7 +13,8 @@ import com.example.chic_it_app.Fragments.ProfileFragment;
 
 
 public class CreatingcontentActivity extends AppCompatActivity {
-
+  /*This class represents the permission of a "content creator" when he can publish posts
+  and view his profile page.*/
     private BottomNavigationView bottomNavigationView;
     private Fragment selectorFragment;
 

@@ -27,6 +27,8 @@ import java.util.HashMap;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class EditProfileModel {
+    /*This class is the model of the "EditProfile" all the connection to Firebase is done through this class.*/
+
     private Activity activity;
     private StorageTask uploadTask;
 
@@ -34,6 +36,7 @@ public class EditProfileModel {
         this.activity = activity;
 
     }
+    //to get my username, fullname, and image profile
     public void firebase_username(FirebaseUser fUser, EditText fullname, EditText username, CircleImageView imageProfile){
         FirebaseDatabase.getInstance().getReference().child("Users").child(fUser.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
@@ -50,6 +53,7 @@ public class EditProfileModel {
             }
         });
     }
+    //update in the firebase my gender amd size
     public void pust_gender_size(String text_gender, String text_size,FirebaseUser fUser){
         HashMap<String, Object> map = new HashMap<>();
         map.put("gender", text_gender);
@@ -57,6 +61,7 @@ public class EditProfileModel {
         FirebaseDatabase.getInstance().getReference().child("Users").child(fUser.getUid()).updateChildren(map);
     }
 
+    //to update my profile in new data on the firebase
     public void update_profile(EditText fullname, EditText username,FirebaseUser fUser){
         HashMap<String, Object> map = new HashMap<>();
         map.put("fullname", fullname.getText().toString());

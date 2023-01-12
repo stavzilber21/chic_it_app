@@ -29,12 +29,13 @@ import java.util.HashMap;
 import java.util.Locale;
 
 public class RegisterActivity extends AppCompatActivity {
-
+    //This class is for a new user of the application logging in for the first time.
+    RegisterModel model = new RegisterModel(this);
     EditText username, fullname, email, password, phone;
     Button register;
     TextView txt_login;
     FirebaseAuth auth;
-    DatabaseReference reference;
+
     ProgressDialog pd;
 
     @SuppressLint("MissingInflatedId")
@@ -81,7 +82,6 @@ public class RegisterActivity extends AppCompatActivity {
                     String str_password = password.getText().toString();
                     String str_phone = phone.getText().toString();
 
-                    // check if the input is write correctly
                     if (TextUtils.isEmpty(str_username) || TextUtils.isEmpty(str_fullname)
                             || TextUtils.isEmpty(str_email) ||TextUtils.isEmpty(str_password) || TextUtils.isEmpty(str_phone)) {
                         Toast.makeText(RegisterActivity.this, "All fields are required!", Toast.LENGTH_SHORT).show();
@@ -91,7 +91,7 @@ public class RegisterActivity extends AppCompatActivity {
                     else if (str_phone.length() < 12) {
                         Toast.makeText(RegisterActivity.this, "Phone must have 12 characters", Toast.LENGTH_SHORT).show();
                     } else {
-                        register(str_username, str_fullname, str_email, str_password,str_phone);
+                        model.register(str_username, str_fullname, str_email, str_password,str_phone,auth,pd);
                     }
                 });
 
@@ -105,43 +105,5 @@ public class RegisterActivity extends AppCompatActivity {
 
     }
 
-    //connect to details of user to firebase
-    private void register(final String username, final String fullname, String email, String password, String phone ){
-        auth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(RegisterActivity.this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            FirebaseUser firebaseUser = auth.getCurrentUser();
-                            String userid = firebaseUser.getUid();
-                            // to create sub tree in firebase ti Users
-                            reference = FirebaseDatabase.getInstance().getReference().child("Users").child(userid);
 
-                            //we add the valur to HashMap and Present it to the user
-                            HashMap<String, Object> hashMap = new HashMap<>();
-                            hashMap.put("id", userid);
-                            hashMap.put("username", username.toLowerCase());
-                            hashMap.put("fullname", fullname);
-                            hashMap.put("phone", phone);
-                            hashMap.put("imageurl","https://firebasestorage.googleapis.com/v0/b/chicit-a5e00.appspot.com/o/placeholder.png?alt=media&token=e355a742-f8f6-4ca6-b4d4-734dfb6091a3");
-                            //to enter the fields of User to tree in the firebase
-                            reference.setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if(task.isSuccessful()) {
-                                        pd.dismiss();
-                                        Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
-                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        startActivity(intent);
-                                    }
-
-                                }
-                            });
-                        } else {
-                            pd.dismiss();
-                            Toast.makeText(RegisterActivity.this, "You can't register with this email or password", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-    }
 }

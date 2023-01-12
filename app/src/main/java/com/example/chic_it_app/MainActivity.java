@@ -19,6 +19,7 @@ import android.widget.PopupMenu;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener  {
+    //In this class you choose which permission to enter - content creator/user.
     Button user, creating_content;
     ImageView more;
 
@@ -63,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         popup.show();
         popup.setOnMenuItemClickListener(MainActivity.this);
     }
-//dialog that ask the user befor he click.
+//dialog that ask the user before you click.
     public void dialog_exit(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setCancelable(true);
@@ -83,6 +84,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 
     }
 
+    //option in the menu
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {

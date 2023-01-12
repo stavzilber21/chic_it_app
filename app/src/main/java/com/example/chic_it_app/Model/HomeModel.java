@@ -16,20 +16,20 @@ import java.util.Collections;
 import java.util.List;
 
 public class HomeModel {
+    /*This class is the model of the "home page" all the connection to Firebase is done through this class.*/
     private Fragment fragment;
 
     public HomeModel(Fragment fragment) {
         this.fragment = fragment;
 
     }
-
+    //View all posts
     public void readPosts(List<Post> mPosts, PostAdapter postAdapter) {
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Posts");
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                if (TextUtils.isEmpty(search_bar.getText().toString())){
                 mPosts.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Post post = snapshot.getValue(Post.class);
@@ -38,7 +38,6 @@ public class HomeModel {
                 }
 
                 postAdapter.notifyDataSetChanged();
-//                }
             }
 
             @Override

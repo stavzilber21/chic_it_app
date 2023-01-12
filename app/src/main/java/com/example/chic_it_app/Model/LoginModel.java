@@ -23,17 +23,15 @@ import com.google.firebase.database.ValueEventListener;
 public class LoginModel {
     private Activity activity;
     DatabaseReference reference;
-
-//    Login
+    /*This class is the model of the "login page" all the connection to Firebase is done through this class.*/
 
     public LoginModel(Activity activity) {
         this.activity = activity;
 
     }
 
+    //to connect my account of chic it
     public void login (String str_email , String str_password, FirebaseAuth auth, ProgressDialog pd){
-
-
         if(TextUtils.isEmpty(str_email) || TextUtils.isEmpty(str_password)) {
             Toast.makeText(activity, "All fiels are required!", Toast.LENGTH_SHORT).show();
         } else {

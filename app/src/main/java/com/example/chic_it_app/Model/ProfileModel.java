@@ -20,13 +20,14 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ProfileModel {
+    /*This class is the model of the "profile page" all the connection to Firebase is done through this class.*/
     private Fragment fragment;
 
     public ProfileModel(Fragment fragment) {
         this.fragment = fragment;
 
     }
-
+    //With the help of this function we will be able to display all the posts that the user liked.
     public void getSavedPosts(FirebaseUser fUser, List<Post> myLikedPosts, PhotoAdapter postAdapterLikes) {
 
         final List<String> savedIds = new ArrayList<>();
@@ -72,6 +73,7 @@ public class ProfileModel {
 
     }
 
+    //With the help of this function we will be able to display all the posts that the user uploaded.
     public void myPhotos(List<Post> myPhotoList,String profileId,PhotoAdapter photoAdapter) {
 
         FirebaseDatabase.getInstance().getReference().child("Posts").addValueEventListener(new ValueEventListener() {
@@ -98,6 +100,7 @@ public class ProfileModel {
 
     }
 
+    //to display the count of the post that I'm uploaded.
     public void getPostCount(String profileId, TextView posts) {
 
         FirebaseDatabase.getInstance().getReference().child("Posts").addValueEventListener(new ValueEventListener() {
@@ -121,6 +124,7 @@ public class ProfileModel {
 
     }
 
+    //to display the details about the current user.
     public void userInfo(String profileId, TextView fullname, TextView username, CircleImageView imageProfile) {
 
         FirebaseDatabase.getInstance().getReference().child("Users").child(profileId).addValueEventListener(new ValueEventListener() {

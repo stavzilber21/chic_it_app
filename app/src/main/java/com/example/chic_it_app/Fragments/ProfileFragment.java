@@ -37,6 +37,7 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ProfileFragment extends Fragment {
+    //This class represents the current user's profile page.
     ProfileModel model = new ProfileModel(this);
 
     private RecyclerView recyclerViewLikes;
@@ -122,7 +123,7 @@ public class ProfileFragment extends Fragment {
         recyclerView.setVisibility(View.VISIBLE);
         recyclerViewLikes.setVisibility(View.GONE);
 
-        //if the user click on the myPictures icon  we Present him the list of the posts he uploads
+        //if the user click on the myPictures icon we Present him the list of the posts he uploads
         myPictures.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

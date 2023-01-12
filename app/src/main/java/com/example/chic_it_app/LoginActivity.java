@@ -36,6 +36,8 @@ import org.json.JSONException;
 import java.util.EventListener;
 
 public class LoginActivity extends AppCompatActivity {
+    //Login to chic it
+
     LoginModel model = new LoginModel(this);
     EditText email, password;
     Button login;

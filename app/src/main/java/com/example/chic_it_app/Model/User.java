@@ -3,6 +3,7 @@ package com.example.chic_it_app.Model;
 
 
 public class User {
+    //This class holds the user object and all its fields.
 
     private String fullname;
     private String email;

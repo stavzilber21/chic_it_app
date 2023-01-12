@@ -14,6 +14,8 @@ import com.example.chic_it_app.Fragments.SearchFragment;
 
 
 public class UserActivity extends AppCompatActivity {
+    /*This class represents the permission of a "user" when he open home page, search posts
+  and view his profile page.*/
 
     private BottomNavigationView bottomNavigationView;
     private Fragment selectorFragment;

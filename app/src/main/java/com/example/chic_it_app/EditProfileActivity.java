@@ -44,6 +44,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 public class EditProfileActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
+    //This class is for the possibility to edit your profile.
     EditProfileModel model = new EditProfileModel(this);
 
     private ImageView close;
@@ -78,12 +79,11 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
 
         fUser = FirebaseAuth.getInstance().getCurrentUser();
         storageRef = FirebaseStorage.getInstance().getReference().child("Uploads");
-//        bio = findViewById(R.id.bio);
 
         Spinner spin = (Spinner) findViewById(R.id.gender);
         spin.setOnItemSelectedListener(this);
 
-        //Creating the ArrayAdapter instance having the bank name list
+        //Creating the ArrayAdapter instance having the bank name list of gender
         ArrayAdapter aa = new ArrayAdapter(this,android.R.layout.simple_spinner_item, gender_opt);
         aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         //Setting the ArrayAdapter data on the Spinner
@@ -92,7 +92,7 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
         Spinner spin2 = (Spinner) findViewById(R.id.size);
         spin2.setOnItemSelectedListener(this);
 
-        //Creating the ArrayAdapter instance having the bank name list
+        //Creating the ArrayAdapter instance having the bank name list of size
         ArrayAdapter bb = new ArrayAdapter(this,android.R.layout.simple_spinner_item, size_opt);
         bb.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         //Setting the ArrayAdapter data on the Spinner
@@ -120,11 +120,13 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
         });
 
 
+        //to update in my profile and in firebase - size and gender
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String text_gender = spin.getSelectedItem().toString();
                 String text_size = spin2.getSelectedItem().toString();
+                //call function from model class
                 model.pust_gender_size(text_gender,text_size,fUser);
                 updateProfile();
                 finish();

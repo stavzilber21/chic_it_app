@@ -42,7 +42,10 @@ import java.util.HashMap;
 import java.util.List;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
-
+    /*This class coordinates between the data in Firebase and the display,
+    so that for each post on the home page all its details will appear.
+    In this class, all the functions related to various options to be done through the post,
+    delete it, contact the creator are implemented.*/
     private Context mContext;
     private List<Post> mPosts;
     private FirebaseUser firebaseUser;
@@ -75,6 +78,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
         holder.store.setText(post.getStore());
         holder.type.setText(post.getType());
 
+        //to display the username of publisher and his image profile
         FirebaseDatabase.getInstance().getReference().child("Users").child(post.getPublisher()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -93,7 +97,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
             }
         });
         isSaved(post.getPostid(), holder.save);
-       //change the fild in the fire base
+       //If you liked this post it is added to the items you liked.
         holder.save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -106,8 +110,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
                 }
             }
         });
-        /* if toy click on the delete icon we check if it is your post, If it's a post you uploaded, we make sure the user really
-         wants to delete the post, and if so, we remove it from Firefox*/
+        /* if you click on the delete icon we check if it is your post, If it's a post you uploaded, we make sure the user really
+         wants to delete the post, and if so, we remove it from Firebase*/
         holder.delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -127,8 +131,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()) {
                                             Toast.makeText(mContext, "deleted!", Toast.LENGTH_SHORT).show();
-                                            HomeFragment homeFragment = new HomeFragment();
-                                            homeFragment.count_post();
+//                                            HomeFragment homeFragment = new HomeFragment();
+//                                            homeFragment.count_post();
                                         }
 
                                     }
@@ -160,7 +164,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
                         .replace(R.id.fragment_container, new ProfileFragment()).commit();
             }
         });
-        /*If a user clicks on the button username we display the profile picture*/
+        /*If a user clicks on the button username we display the profile of creator of post*/
         holder.username.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -171,7 +175,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
                         .replace(R.id.fragment_container, new ProfileFragment()).commit();
             }
         });
-        /*If a user clicks on the button postImage we display the profile picture*/
+        /*If a user clicks on the button postImage It goes to this post's page only. */
         holder.postImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -235,7 +239,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
 
         public Viewholder(@NonNull View itemView) {
             super(itemView);
-            //take all the varbiale ftom the xml
+            //take all the variable from the xml
             imageProfile = itemView.findViewById(R.id.image_profile);
             postImage = itemView.findViewById(R.id.post_image);
             save = itemView.findViewById(R.id.save);
@@ -249,7 +253,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
 
         }
     }
-    /*when you click on sava icon we check if the picture is alredy seved, if it wasnt save before we change the
+    /*when you click on save icon we check if the picture is alredy saved, if it wasn't save before we change the
         icon to be full and add it to the List of saved posts, if it is not the first time we change the icon and we remov
         it from the List of saved posts*/
     private void isSaved (final String postId, final ImageView image) {

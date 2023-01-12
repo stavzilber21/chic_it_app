@@ -11,6 +11,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class StartActivity extends AppCompatActivity {
+    //The application page opens, where you can choose whether to register or log in.
 
     Button login, register;
     FirebaseUser firebaseUser;

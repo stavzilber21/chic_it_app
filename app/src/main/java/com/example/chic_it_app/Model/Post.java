@@ -1,6 +1,7 @@
 package com.example.chic_it_app.Model;
 
 public class Post {
+    //This class holds the post object and all its fields.
 
     private String description;
     private String store;

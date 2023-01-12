@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PostDetailFragment extends Fragment {
+    //to display the details of the post
     PostDetailModel model = new PostDetailModel(this);
     private String postId;
     private RecyclerView recyclerView;
