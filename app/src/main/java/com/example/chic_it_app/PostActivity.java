@@ -18,9 +18,6 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.example.chic_it_app.Model.PostModel;
-import com.example.chic_it_app.Model.RegisterModel;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -35,11 +32,12 @@ import java.util.HashMap;
 
 
 public class PostActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
-    //Through this class you can upload a new post to the application.
-    PostModel model = new PostModel(this);
     ImageView close;
     ImageView imageAdded;
     Uri imageUri;
+    StorageReference storageReference;
+    ProgressDialog progressDialog;
+    String imageUrl;
     EditText description;
     EditText store;
     EditText price;
@@ -60,6 +58,7 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
         price = findViewById(R.id.price);
         type = (Spinner) findViewById(R.id.typeSpinner);
 
+
         close.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -67,7 +66,7 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
                 finish();
             }
         });
-        //to upload posts
+
         imageAdded.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -75,11 +74,11 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
                 selectImage();
             }
         });
-        // to post a post
+
         post.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                model.uploadImage(imageUri,description,store,price,choose);
+                uploadImage();
             }
         });
 
@@ -97,6 +96,12 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {
         choose = types[position];
+//        HashMap<String, Object> map = new HashMap<>();
+//        map.put("type", types[position]);
+//        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts");
+//        String postId = ref.push().getKey();
+//        ref.child(postId).setValue(map);
+//        Toast.makeText(getApplicationContext(), types[position], Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -105,8 +110,61 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
+    private void uploadImage() {
 
-    //to select picture from my phone
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Uploading");
+        progressDialog.show();
+
+        //if the uri of the picture is null
+        if (imageUri != null){
+            storageReference = FirebaseStorage.getInstance().getReference("Posts").child(System.currentTimeMillis() + "." + getFileExtension(imageUri));
+            StorageTask uploadtask = storageReference.putFile(imageUri);
+            uploadtask.continueWithTask(new Continuation() {
+                @Override
+                public Object then(@NonNull Task task) throws Exception {
+                    if (!task.isSuccessful()){
+                        throw task.getException();
+                    }
+
+                    return storageReference .getDownloadUrl();
+                }
+            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    Uri downloadUri = task.getResult();
+                    imageUrl = downloadUri.toString();
+
+                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts");
+                    String postId = ref.push().getKey();
+
+                    HashMap<String , Object> map = new HashMap<>();
+                    map.put("postid" , postId);
+                    map.put("imageurl" , imageUrl);
+                    map.put("description" , description.getText().toString());
+                    map.put("store" , store.getText().toString());
+                    map.put("price" , price.getText().toString());
+                    map.put("type", choose);
+                    map.put("publisher" , FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+                    ref.child(postId).setValue(map);
+
+                    progressDialog.dismiss();
+                    Toast.makeText(PostActivity.this, "The post has been uploaded!", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(PostActivity.this , CreatingcontentActivity.class));
+                    finish();
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(PostActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            Toast.makeText(this, "No image was selected!", Toast.LENGTH_SHORT).show();
+        }
+
+    }
     private void selectImage() {
 
         Intent intent = new Intent();
@@ -115,7 +173,11 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
         startActivityForResult(intent,100);
 
     }
+    private String getFileExtension(Uri uri) {
 
+        return MimeTypeMap.getSingleton().getExtensionFromMimeType(this.getContentResolver().getType(uri));
+
+    }
 
 
     @Override

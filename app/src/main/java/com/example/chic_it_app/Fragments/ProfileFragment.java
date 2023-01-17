@@ -17,7 +17,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.chic_it_app.Adapter.PhotoAdapter;
-import com.example.chic_it_app.Model.ProfileModel;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -37,8 +36,6 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ProfileFragment extends Fragment {
-    //This class represents the current user's profile page.
-    ProfileModel model = new ProfileModel(this);
 
     private RecyclerView recyclerViewLikes;
     private PhotoAdapter postAdapterLikes;
@@ -100,17 +97,17 @@ public class ProfileFragment extends Fragment {
         postAdapterLikes = new PhotoAdapter(getContext(), myLikedPosts);
         recyclerViewLikes.setAdapter(postAdapterLikes);
 
-        model.userInfo(profileId,fullname,username,imageProfile);
-        model.getPostCount(profileId,posts);
-        model.myPhotos(myPhotoList,profileId,photoAdapter);
-        model.getSavedPosts(fUser,myLikedPosts,postAdapterLikes);
+        userInfo();
+        getPostCount();
+        myPhotos();
+        getSavedPosts();
 
         if (profileId.equals(fUser.getUid())) {
             editProfile.setText("Edit profile");
         } else {
-//            checkFollowingStatus();
+            checkFollowingStatus();
         }
-        //if the user click on the editProfile icon we transfer him to the EditProfileActivity class
+
         editProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -123,7 +120,6 @@ public class ProfileFragment extends Fragment {
         recyclerView.setVisibility(View.VISIBLE);
         recyclerViewLikes.setVisibility(View.GONE);
 
-        //if the user click on the myPictures icon we Present him the list of the posts he uploads
         myPictures.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -131,7 +127,7 @@ public class ProfileFragment extends Fragment {
                 recyclerViewLikes.setVisibility(View.GONE);
             }
         });
-        //if the user click on the savedPictures icon  we Present him the list of the posts he saved
+
         savedPictures.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -142,10 +138,136 @@ public class ProfileFragment extends Fragment {
         return view;
     }
 
+    private void getSavedPosts() {
 
+        final List<String> savedIds = new ArrayList<>();
 
+        FirebaseDatabase.getInstance().getReference().child("Saves").child(fUser.getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    savedIds.add(snapshot.getKey());
+                }
 
+                FirebaseDatabase.getInstance().getReference().child("Posts").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot1) {
+                        myLikedPosts.clear();
 
+                        for (DataSnapshot snapshot1 : dataSnapshot1.getChildren()) {
+                            Post post = snapshot1.getValue(Post.class);
 
+                            for (String id : savedIds) {
+                                if (post.getPostid().equals(id)) {
+                                    myLikedPosts.add(post);
+                                }
+                            }
+                        }
 
+                        postAdapterLikes.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    private void myPhotos() {
+
+        FirebaseDatabase.getInstance().getReference().child("Posts").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                myPhotoList.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Post post = snapshot.getValue(Post.class);
+
+                    if (post.getPublisher().equals(profileId)) {
+                        myPhotoList.add(post);
+                    }
+                }
+
+                Collections.reverse(myPhotoList);
+                photoAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    private void checkFollowingStatus() {
+
+        FirebaseDatabase.getInstance().getReference().child("Follow").child(fUser.getUid()).child("following").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.child(profileId).exists()) {
+                    editProfile.setText("following");
+                } else {
+                    editProfile.setText("follow");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    private void getPostCount() {
+
+        FirebaseDatabase.getInstance().getReference().child("Posts").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                int counter = 0;
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Post post = snapshot.getValue(Post.class);
+                    String u = post.getPublisher();
+                    if (post.getPublisher().equals(profileId)) counter ++;
+                }
+
+                posts.setText(String.valueOf(counter));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    private void userInfo() {
+
+        FirebaseDatabase.getInstance().getReference().child("Users").child(profileId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                Picasso.get().load(user.getImageurl()).into(imageProfile);
+                username.setText(user.getUsername());
+                fullname.setText(user.getFullname());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
 }

@@ -16,8 +16,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.chic_it_app.Model.EditProfileModel;
-import com.example.chic_it_app.Model.RegisterModel;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -44,8 +42,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 public class EditProfileActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
-    //This class is for the possibility to edit your profile.
-    EditProfileModel model = new EditProfileModel(this);
 
     private ImageView close;
     private CircleImageView imageProfile;
@@ -58,11 +54,11 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
     private FirebaseUser fUser;
 
     private Uri mImageUri;
-
+    private StorageTask uploadTask;
     private StorageReference storageRef;
 
     String[] gender_opt ={"male","female"};
-    String[] size_opt ={"s","m"};
+    String[] size_opt ={"s","m","l"};
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -79,11 +75,12 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
 
         fUser = FirebaseAuth.getInstance().getCurrentUser();
         storageRef = FirebaseStorage.getInstance().getReference().child("Uploads");
+//        bio = findViewById(R.id.bio);
 
         Spinner spin = (Spinner) findViewById(R.id.gender);
         spin.setOnItemSelectedListener(this);
 
-        //Creating the ArrayAdapter instance having the bank name list of gender
+        //Creating the ArrayAdapter instance having the bank name list
         ArrayAdapter aa = new ArrayAdapter(this,android.R.layout.simple_spinner_item, gender_opt);
         aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         //Setting the ArrayAdapter data on the Spinner
@@ -92,14 +89,28 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
         Spinner spin2 = (Spinner) findViewById(R.id.size);
         spin2.setOnItemSelectedListener(this);
 
-        //Creating the ArrayAdapter instance having the bank name list of size
+        //Creating the ArrayAdapter instance having the bank name list
         ArrayAdapter bb = new ArrayAdapter(this,android.R.layout.simple_spinner_item, size_opt);
         bb.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         //Setting the ArrayAdapter data on the Spinner
         spin2.setAdapter(bb);
 
-        model.firebase_username(fUser,fullname,username,imageProfile);
 
+
+        FirebaseDatabase.getInstance().getReference().child("Users").child(fUser.getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                fullname.setText(user.getFullname());
+                username.setText(user.getUsername());
+                Picasso.get().load(user.getImageurl()).into(imageProfile);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         close.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -119,15 +130,22 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
             }
         });
 
+        imageProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-        //to update in my profile and in firebase - size and gender
+            }
+        });
+
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String text_gender = spin.getSelectedItem().toString();
+                String text = spin.getSelectedItem().toString();
                 String text_size = spin2.getSelectedItem().toString();
-                //call function from model class
-                model.pust_gender_size(text_gender,text_size,fUser);
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("gender", text);
+                map.put("size", text_size);
+                FirebaseDatabase.getInstance().getReference().child("Users").child(fUser.getUid()).updateChildren(map);
                 updateProfile();
                 finish();
             }
@@ -147,14 +165,50 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
 
     }
 
-
-
     private void updateProfile() {
-        model.update_profile(fullname,username,fUser);
-
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("fullname", fullname.getText().toString());
+        map.put("username", username.getText().toString());
+        FirebaseDatabase.getInstance().getReference().child("Users").child(fUser.getUid()).updateChildren(map);
     }
 
+    private void uploadImage() {
+        //Upload image to firebase storage
+        final ProgressDialog pd = new ProgressDialog(this);
+        pd.setMessage("Uploading");
+        pd.show();
 
+        if (mImageUri != null) {
+            final StorageReference fileRef = storageRef.child(System.currentTimeMillis() + ".jpeg");
+
+            uploadTask = fileRef.putFile(mImageUri);
+            uploadTask.continueWithTask(new Continuation() {
+                @Override
+                public Object then(@NonNull Task task) throws Exception {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+
+                    return  fileRef.getDownloadUrl();
+                }
+            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (task.isSuccessful()) {
+                        Uri downloadUri = task.getResult();
+                        String url = downloadUri.toString();
+
+                        FirebaseDatabase.getInstance().getReference().child("Users").child(fUser.getUid()).child("imageurl").setValue(url);
+                        pd.dismiss();
+                    } else {
+                        Toast.makeText(EditProfileActivity.this, "Upload failed!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        } else {
+            Toast.makeText(this, "No image selected", Toast.LENGTH_SHORT).show();
+        }
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -164,7 +218,7 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
             if(resultCode == Activity.RESULT_OK){
                 mImageUri = data.getData();
                 imageProfile.setImageURI(mImageUri);
-                model.uploadImage(mImageUri,storageRef,fUser);
+                uploadImage();
             }
         }
         else {

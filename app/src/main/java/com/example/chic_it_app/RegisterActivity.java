@@ -16,7 +16,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.chic_it_app.Model.RegisterModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -29,13 +28,13 @@ import java.util.HashMap;
 import java.util.Locale;
 
 public class RegisterActivity extends AppCompatActivity {
-    //This class is for a new user of the application logging in for the first time.
-    RegisterModel model = new RegisterModel(this);
+
     EditText username, fullname, email, password, phone;
     Button register;
     TextView txt_login;
-    FirebaseAuth auth;
 
+    FirebaseAuth auth;
+    DatabaseReference reference;
     ProgressDialog pd;
 
     @SuppressLint("MissingInflatedId")
@@ -53,7 +52,6 @@ public class RegisterActivity extends AppCompatActivity {
         txt_login = findViewById(R.id.txt_login);
 
         auth = FirebaseAuth.getInstance();
-
         //if I already register to application
         txt_login.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,7 +68,8 @@ public class RegisterActivity extends AppCompatActivity {
                 builder.setCancelable(true);
                 builder.setTitle("You have been contacted via your phone");
                 builder.setMessage("");
-                builder.setPositiveButton("Confirm", (dialog, which) -> {
+                builder.setPositiveButton("Confirm", (dialog, which) ->
+                {
                     pd = new ProgressDialog(RegisterActivity.this);
                     //to display the progress of an action that is loading.
                     pd.setMessage("Please wait...");
@@ -91,19 +90,59 @@ public class RegisterActivity extends AppCompatActivity {
                     else if (str_phone.length() < 12) {
                         Toast.makeText(RegisterActivity.this, "Phone must have 12 characters", Toast.LENGTH_SHORT).show();
                     } else {
-                        model.register(str_username, str_fullname, str_email, str_password,str_phone,auth,pd);
+                        register(str_username, str_fullname, str_email, str_password,str_phone);
                     }
                 });
 
-                builder.setNegativeButton("Deny", (dialog, which) -> {
+                builder.setNegativeButton("Deny", (dialog, which) ->
+                {
                     Toast.makeText(RegisterActivity.this, "You will not be able to enter the application!", Toast.LENGTH_SHORT).show();
                 });
                 AlertDialog dialog = builder.create();
                 dialog.show();
+
+
             }
         });
 
     }
 
+    //connect to details of user to firebase
+    private void register(final String username, final String fullname, String email, String password, String phone ){
+        auth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(RegisterActivity.this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            FirebaseUser firebaseUser = auth.getCurrentUser();
+                            String userid = firebaseUser.getUid();
+                            // to create sub tree in firebase ti Users
+                            reference = FirebaseDatabase.getInstance().getReference().child("Users").child(userid);
 
+                            HashMap<String, Object> hashMap = new HashMap<>();
+                            hashMap.put("id", userid);
+                            hashMap.put("username", username.toLowerCase());
+                            hashMap.put("fullname", fullname);
+                            hashMap.put("phone", phone);
+                            hashMap.put("imageurl","https://firebasestorage.googleapis.com/v0/b/chicit-a5e00.appspot.com/o/placeholder.png?alt=media&token=e355a742-f8f6-4ca6-b4d4-734dfb6091a3");
+                            //to enter the fields of User to tree in the firebase
+                            reference.setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if(task.isSuccessful()) {
+                                        pd.dismiss();
+                                        Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        startActivity(intent);
+                                    }
+
+                                }
+                            });
+                        } else {
+                            pd.dismiss();
+                            Toast.makeText(RegisterActivity.this, "You can't register with this email or password", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
 }
