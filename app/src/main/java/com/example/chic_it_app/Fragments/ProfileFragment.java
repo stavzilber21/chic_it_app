@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.chic_it_app.Adapter.PhotoAdapter;
+import com.example.chic_it_app.Adapter.PostAdapter;
+import com.example.chic_it_app.Model.api.RetrofitClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -34,6 +37,9 @@ import java.util.Collections;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ProfileFragment extends Fragment {
 
@@ -62,6 +68,7 @@ public class ProfileFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
         fUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -87,6 +94,7 @@ public class ProfileFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
         myPhotoList = new ArrayList<>();
+        //photoAdapter = new PostAdapter(getContext(), myPhotoList);
         photoAdapter = new PhotoAdapter(getContext(), myPhotoList);
         recyclerView.setAdapter(photoAdapter);
 
@@ -113,9 +121,11 @@ public class ProfileFragment extends Fragment {
             public void onClick(View v) {
                 String btnText = editProfile.getText().toString();
                 if (btnText.equals("Edit profile")) {
-                    startActivity(new Intent(getContext(), EditProfileActivity.class));}
+                    startActivity(new Intent(getContext(), EditProfileActivity.class));
+                }
             }
         });
+
 
         recyclerView.setVisibility(View.VISIBLE);
         recyclerViewLikes.setVisibility(View.GONE);
@@ -139,73 +149,46 @@ public class ProfileFragment extends Fragment {
     }
 
     private void getSavedPosts() {
-
-        final List<String> savedIds = new ArrayList<>();
-
-        FirebaseDatabase.getInstance().getReference().child("Saves").child(fUser.getUid()).addValueEventListener(new ValueEventListener() {
+        myLikedPosts.clear();
+        Call<List<Post>> call = RetrofitClient.getInstance().getAPI().mySavedPosts(fUser.getUid());
+        call.enqueue(new Callback<List<Post>>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    savedIds.add(snapshot.getKey());
+            public void onResponse(Call<List<Post>> call, Response<List<Post>> response) {
+                List<Post> postsList = response.body();
+                if (postsList != null) {
+                    myLikedPosts.addAll(postsList);
+                    Collections.reverse(myLikedPosts);
+                    postAdapterLikes.notifyDataSetChanged();
                 }
-
-                FirebaseDatabase.getInstance().getReference().child("Posts").addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot1) {
-                        myLikedPosts.clear();
-
-                        for (DataSnapshot snapshot1 : dataSnapshot1.getChildren()) {
-                            Post post = snapshot1.getValue(Post.class);
-
-                            for (String id : savedIds) {
-                                if (post.getPostid().equals(id)) {
-                                    myLikedPosts.add(post);
-                                }
-                            }
-                        }
-
-                        postAdapterLikes.notifyDataSetChanged();
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
-
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+            public void onFailure(Call<List<Post>> call, Throwable t) {
 
             }
         });
-
     }
 
     private void myPhotos() {
-
-        FirebaseDatabase.getInstance().getReference().child("Posts").addValueEventListener(new ValueEventListener() {
+        myPhotoList.clear();
+        Call<List<Post>> call = RetrofitClient.getInstance().getAPI().getMyPhoto(fUser.getUid());
+        call.enqueue(new Callback<List<Post>>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                myPhotoList.clear();
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Post post = snapshot.getValue(Post.class);
-
-                    if (post.getPublisher().equals(profileId)) {
-                        myPhotoList.add(post);
-                    }
+            public void onResponse(Call<List<Post>> call, Response<List<Post>> response) {
+                List<Post> postsList = response.body();
+                if (postsList != null) {
+                     myPhotoList.addAll(postsList);
+                    Collections.reverse(myPhotoList);
+                    photoAdapter.notifyDataSetChanged();
                 }
-
-                Collections.reverse(myPhotoList);
-                photoAdapter.notifyDataSetChanged();
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+            public void onFailure(Call<List<Post>> call, Throwable t) {
 
             }
         });
+        //photoAdapter.notifyDataSetChanged();
 
     }
 
@@ -230,44 +213,60 @@ public class ProfileFragment extends Fragment {
     }
 
     private void getPostCount() {
-
-        FirebaseDatabase.getInstance().getReference().child("Posts").addValueEventListener(new ValueEventListener() {
+        fUser = FirebaseAuth.getInstance().getCurrentUser();
+        //firebaseAuth = FirebaseAuth.getInstance();
+        Call<Integer> call = RetrofitClient.getInstance().getAPI().countPost(fUser.getUid());
+        call.enqueue(new Callback<Integer>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                int counter = 0;
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Post post = snapshot.getValue(Post.class);
-                    String u = post.getPublisher();
-                    if (post.getPublisher().equals(profileId)) counter ++;
-                }
-
+            public void onResponse(Call<Integer> call, Response<Integer> response) {
+                int counter = response.body();
                 posts.setText(String.valueOf(counter));
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
+            public void onFailure(Call<Integer> call, Throwable t) {
+                Log.d("Fail", t.getMessage());
             }
         });
+
+//        FirebaseDatabase.getInstance().getReference().child("Posts").addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                int counter = 0;
+//                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                    Post post = snapshot.getValue(Post.class);
+//                    String u = post.getPublisher();
+//                    if (post.getPublisher().equals(profileId)) counter ++;
+//                }
+//
+//                posts.setText(String.valueOf(counter));
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
 
     }
 
     private void userInfo() {
-
-        FirebaseDatabase.getInstance().getReference().child("Users").child(profileId).addValueEventListener(new ValueEventListener() {
+        fUser = FirebaseAuth.getInstance().getCurrentUser();
+        //firebaseAuth = FirebaseAuth.getInstance();
+        Call<User> call = RetrofitClient.getInstance().getAPI().getUserDetails(fUser.getUid());
+        call.enqueue(new Callback<User>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
-                Picasso.get().load(user.getImageurl()).into(imageProfile);
+            public void onResponse(Call<User> call, Response<User> response) {
+                User user = response.body();
+                Picasso.get().load( user.getImageurl()).into(imageProfile);
                 username.setText(user.getUsername());
                 fullname.setText(user.getFullname());
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
+            public void onFailure(Call<User> call, Throwable t) {
+                Log.d("Fail", t.getMessage());
             }
         });
-
     }
 }

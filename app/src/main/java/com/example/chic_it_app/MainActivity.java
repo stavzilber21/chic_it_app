@@ -56,16 +56,15 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     }
     /*When the user clicks, the posts appear over the application in a
      vertical orientation while the user is clicking an item, and then they disappear from the screen.*/
-    private void showPopup(View v)
-    {
+    private void showPopup(View v) {
         PopupMenu popup = new PopupMenu(this, v);
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.main_menu, popup.getMenu());
         popup.show();
         popup.setOnMenuItemClickListener(MainActivity.this);
     }
-//dialog that ask the user before you click.
-    public void dialog_exit(){
+    //dialog that ask the user before you click.
+    public void dialog_exit() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setCancelable(true);
         builder.setTitle("you sure that you want to exit?");

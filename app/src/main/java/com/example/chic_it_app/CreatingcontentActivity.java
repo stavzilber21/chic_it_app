@@ -28,30 +28,22 @@ public class CreatingcontentActivity extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-
                 switch (menuItem.getItemId()){
-
                     // if you what to upload a new post
                     case R.id.nav_add :
                         selectorFragment = null;
                         startActivity(new Intent(CreatingcontentActivity.this , PostActivity.class));
                         break;
-
                     // if you want to see your profile
                     case R.id.nav_profile :
                         selectorFragment = new ProfileFragment();
                         break;
                 }
-
                 if (selectorFragment != null){
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container , selectorFragment).commit();
                 }
-
                 return  true;
-
             }
         });
-
-
     }
 }

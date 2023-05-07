@@ -58,11 +58,6 @@ public class RegisterActivity extends AppCompatActivity {
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                    pd = new ProgressDialog(RegisterActivity.this);
-//                    //to display the progress of an action that is loading.
-//                    pd.setMessage("Please wait...");
-//                    pd.show();
-
                 String str_username = username.getText().toString();
                 String str_fullname = fullname.getText().toString();
                 String str_email = email.getText().toString();
@@ -78,8 +73,6 @@ public class RegisterActivity extends AppCompatActivity {
                 else if (str_phone.length() < 12) {
                     Toast.makeText(RegisterActivity.this, "Phone must have 12 characters", Toast.LENGTH_SHORT).show();
                 } else {
-//                    FirebaseUser firebaseUser = auth.getCurrentUser();
-//                    String userid = firebaseUser.getUid();
                     Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().addUser(str_username, str_fullname, str_email, str_phone, str_password);
                     call.enqueue(new Callback<ResponseBody>() {
                         @Override
@@ -95,14 +88,8 @@ public class RegisterActivity extends AppCompatActivity {
                     Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
-
                 }
             }
-
-
         });
-
     }
-
-
 }

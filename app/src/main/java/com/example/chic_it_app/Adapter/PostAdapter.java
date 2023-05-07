@@ -3,6 +3,7 @@ package com.example.chic_it_app.Adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,7 @@ import com.example.chic_it_app.Fragments.PostDetailFragment;
 import com.example.chic_it_app.LoginActivity;
 import com.example.chic_it_app.MainActivity;
 import com.example.chic_it_app.Model.User;
+import com.example.chic_it_app.Model.api.RetrofitClient;
 import com.example.chic_it_app.PostActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -38,8 +40,14 @@ import com.example.chic_it_app.Model.Post;
 import com.example.chic_it_app.R;
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
     /*This class coordinates between the data in Firebase and the display,
@@ -56,7 +64,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
     }
 
-    public void setFilter(List<Post> postList){
+    public void setFilter(List<Post> postList) {
         this.mPosts = postList;
         notifyDataSetChanged();
     }
@@ -79,10 +87,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
         holder.type.setText(post.getType());
 
         //to display the username of publisher and his image profile
-        FirebaseDatabase.getInstance().getReference().child("Users").child(post.getPublisher()).addValueEventListener(new ValueEventListener() {
+        Call<User> call = RetrofitClient.getInstance().getAPI().getUserDetails(post.getPublisher());
+        call.enqueue(new Callback<User>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
+            public void onResponse(Call<User> call, Response<User> response) {
+                User user = response.body();
                 if (user.getImageurl().equals("default")) {
                     holder.imageProfile.setImageResource(R.mipmap.ic_launcher);
                 } else {
@@ -92,64 +101,66 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
+            public void onFailure(Call<User> call, Throwable t) {
+                Log.d("Fail", t.getMessage());
             }
         });
-        isSaved(post.getPostid(), holder.save);
-       //If you liked this post it is added to the items you liked.
+
+        isSaved(firebaseUser.getUid(),post.getPostid(), holder.save);
+
+        //If you liked this post it is added to the items you liked.
         holder.save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (holder.save.getTag().equals("save")) {
-                    FirebaseDatabase.getInstance().getReference().child("Saves")
-                            .child(firebaseUser.getUid()).child(post.getPostid()).setValue(true);
-                } else {
-                    FirebaseDatabase.getInstance().getReference().child("Saves")
-                            .child(firebaseUser.getUid()).child(post.getPostid()).removeValue();
-                }
+                Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().savePost(firebaseUser.getUid(), post.getPostid());
+                call.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        notifyDataSetChanged();
+                        Log.d("savePost", "success");
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        Log.d("savePost", t.getMessage());
+                    }
+                });
             }
         });
+
         /* if you click on the delete icon we check if it is your post, If it's a post you uploaded, we make sure the user really
          wants to delete the post, and if so, we remove it from Firebase*/
         holder.delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                builder.setCancelable(true);
+                builder.setTitle("you sure that you want to delete?");
+                builder.setMessage("");
+                builder.setPositiveButton("yes", (dialog, which) -> {
                 FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
-                if (FirebaseDatabase.getInstance().getReference().child("Posts")
-                        .child(post.getPostid()).child(post.getPublisher()).getKey().equals(fUser.getUid())) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                    builder.setCancelable(true);
-                    builder.setTitle("you sure that you want to delete?");
-                    builder.setMessage("");
-                    builder.setPositiveButton("yes", (dialog, which) ->
-                    {
-                        FirebaseDatabase.getInstance().getReference().child("Posts")
-                                .child(post.getPostid()).removeValue()
-                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if (task.isSuccessful()) {
-                                            Toast.makeText(mContext, "deleted!", Toast.LENGTH_SHORT).show();
-//                                            HomeFragment homeFragment = new HomeFragment();
-//                                            homeFragment.count_post();
-                                        }
+                Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().deletePost(post.getPostid(),post.getPublisher(),fUser.getUid());
+                call.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        notifyDataSetChanged();
+                        Toast.makeText(mContext, "deleted!", Toast.LENGTH_SHORT).show();
+                    }
 
-                                    }
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
 
-                                });
-                    });
+                    }
+                });
+                });
 
-                    builder.setNegativeButton("no", (dialog, which) ->
-                    {
-                        Toast.makeText(mContext, "The post was not deleted!", Toast.LENGTH_SHORT).show();
-                    });
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-
-                } else {
-                    Toast.makeText(mContext, "YOU CANT!", Toast.LENGTH_SHORT).show();
-                }
+                builder.setNegativeButton("no", (dialog, which) ->
+                {
+                    Toast.makeText(mContext, "The post was not deleted!", Toast.LENGTH_SHORT).show();
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
             }
         });
 
@@ -164,6 +175,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
                         .replace(R.id.fragment_container, new ProfileFragment()).commit();
             }
         });
+
         /*If a user clicks on the button username we display the profile of creator of post*/
         holder.username.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -175,18 +187,20 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
                         .replace(R.id.fragment_container, new ProfileFragment()).commit();
             }
         });
+
         /*If a user clicks on the button postImage It goes to this post's page only. */
         holder.postImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit().putString("postid", post.getPostid()).apply();
 
-                ((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction()
+                ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, new PostDetailFragment()).commit();
             }
         });
+
         /* If a user clicks on the button contact_us we send it to that seller's WhatsApp*/
-        holder.contact_us.setOnClickListener(new View.OnClickListener(){
+        holder.contact_us.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String[] user_phone = new String[1];
@@ -198,7 +212,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
 
                         String a = "https://wa.me/";
                         String b = "?text=Hi! I'm from chic it, I want ask you about your look " + post.getDescription();
-                        String Url = a+user_phone[0]+b;
+                        String Url = a + user_phone[0] + b;
                         Intent intent = new Intent(Intent.ACTION_VIEW);
                         intent.setData(Uri.parse(Url));
                         mContext.startActivity(intent);
@@ -214,7 +228,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
 
             }
         });
-
     }
 
     @Override
@@ -253,24 +266,32 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
 
         }
     }
+
     /*when you click on save icon we check if the picture is alredy saved, if it wasn't save before we change the
         icon to be full and add it to the List of saved posts, if it is not the first time we change the icon and we remov
         it from the List of saved posts*/
-    private void isSaved (final String postId, final ImageView image) {
-        FirebaseDatabase.getInstance().getReference().child("Saves").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
+    private void isSaved( String uid,  final  String postId,  final ImageView image) {
+        Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().check(uid,postId);
+        call.enqueue(new Callback<ResponseBody>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.child(postId).exists()) {
-                    image.setImageResource(R.drawable.ic_liked);
-                    image.setTag("saved");
-                } else {
-                    image.setImageResource(R.drawable.ic_like);
-                    image.setTag("save");
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                try {
+                    String res = response.body().string();
+                    if(res.equals("saved")) {
+                        image.setImageResource(R.drawable.ic_liked);
+                        image.setTag("saved");
+                    } else {
+                        image.setImageResource(R.drawable.ic_like);
+                        image.setTag("save");
+                    }
+                } catch (IOException e) {
+
                 }
+
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
 
             }
         });

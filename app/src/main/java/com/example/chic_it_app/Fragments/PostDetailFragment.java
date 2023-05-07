@@ -14,6 +14,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.chic_it_app.Model.User;
+import com.example.chic_it_app.Model.api.RetrofitClient;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
@@ -24,6 +26,10 @@ import com.example.chic_it_app.R;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class PostDetailFragment extends Fragment {
 
@@ -48,21 +54,22 @@ public class PostDetailFragment extends Fragment {
         postAdapter = new PostAdapter(getContext(), postList);
         recyclerView.setAdapter(postAdapter);
 
-        FirebaseDatabase.getInstance().getReference().child("Posts").child(postId).addValueEventListener(new ValueEventListener() {
+        //send post details
+        Call<Post> call = RetrofitClient.getInstance().getAPI().getPostDetails(postId);
+        call.enqueue(new Callback<Post>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            public void onResponse(Call<Post> call, Response<Post> response) {
                 postList.clear();
-                postList.add(dataSnapshot.getValue(Post.class));
-
+                Post post = response.body();
+                postList.add(post);
                 postAdapter.notifyDataSetChanged();
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+            public void onFailure(Call<Post> call, Throwable t) {
 
             }
         });
-
         return view;
     }
 }

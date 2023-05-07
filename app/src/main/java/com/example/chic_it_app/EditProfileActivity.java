@@ -10,12 +10,14 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.chic_it_app.Model.api.RetrofitClient;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -36,6 +38,10 @@ import com.squareup.picasso.Picasso;
 import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -52,6 +58,7 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
 
 
     private FirebaseUser fUser;
+    private String imageurl = null;
 
     private Uri mImageUri;
     private StorageTask uploadTask;
@@ -75,7 +82,6 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
 
         fUser = FirebaseAuth.getInstance().getCurrentUser();
         storageRef = FirebaseStorage.getInstance().getReference().child("Uploads");
-//        bio = findViewById(R.id.bio);
 
         Spinner spin = (Spinner) findViewById(R.id.gender);
         spin.setOnItemSelectedListener(this);
@@ -95,20 +101,21 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
         //Setting the ArrayAdapter data on the Spinner
         spin2.setAdapter(bb);
 
-
-
-        FirebaseDatabase.getInstance().getReference().child("Users").child(fUser.getUid()).addValueEventListener(new ValueEventListener() {
+        //fUser = FirebaseAuth.getInstance().getCurrentUser();
+        Call<User> call = RetrofitClient.getInstance().getAPI().getUserDetails(fUser.getUid());
+        call.enqueue(new Callback<User>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
-                fullname.setText(user.getFullname());
+            public void onResponse(Call<User> call, Response<User> response) {
+                User user = response.body();
+                Picasso.get().load( user.getImageurl()).into(imageProfile);
                 username.setText(user.getUsername());
-                Picasso.get().load(user.getImageurl()).into(imageProfile);
+                fullname.setText(user.getFullname());
+                imageurl = user.getImageurl();
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
+            public void onFailure(Call<User> call, Throwable t) {
+                Log.d("Fail", t.getMessage());
             }
         });
 
@@ -140,19 +147,28 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String text = spin.getSelectedItem().toString();
-                String text_size = spin2.getSelectedItem().toString();
-                HashMap<String, Object> map = new HashMap<>();
-                map.put("gender", text);
-                map.put("size", text_size);
-                FirebaseDatabase.getInstance().getReference().child("Users").child(fUser.getUid()).updateChildren(map);
-                updateProfile();
-                finish();
+                String gender = spin.getSelectedItem().toString();
+                String size = spin2.getSelectedItem().toString();
+                String full_name = fullname.getText().toString();
+                String user_name = username.getText().toString();
+                Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().editProfile(fUser.getUid(), gender, size, full_name, user_name, imageurl);
+                call.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        Log.d("add user", "success");
+                        finish();
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        Log.d("add user", t.getMessage());
+                    }
+                });
             }
         });
-
-
     }
+
     //Performing action onItemSelected and onNothing selected
     @Override
     public void onItemSelected(AdapterView<?> arg0, View arg1, int position,long id) {
@@ -163,13 +179,6 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
     public void onNothingSelected(AdapterView<?> arg0) {
         // TODO Auto-generated method stub
 
-    }
-
-    private void updateProfile() {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("fullname", fullname.getText().toString());
-        map.put("username", username.getText().toString());
-        FirebaseDatabase.getInstance().getReference().child("Users").child(fUser.getUid()).updateChildren(map);
     }
 
     private void uploadImage() {
@@ -197,8 +206,8 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
                     if (task.isSuccessful()) {
                         Uri downloadUri = task.getResult();
                         String url = downloadUri.toString();
-
-                        FirebaseDatabase.getInstance().getReference().child("Users").child(fUser.getUid()).child("imageurl").setValue(url);
+                        imageurl = url;
+                        //FirebaseDatabase.getInstance().getReference().child("Users").child(fUser.getUid()).child("imageurl").setValue(url);
                         pd.dismiss();
                     } else {
                         Toast.makeText(EditProfileActivity.this, "Upload failed!", Toast.LENGTH_SHORT).show();
