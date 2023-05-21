@@ -3,6 +3,8 @@ package com.example.chic_it_app;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
@@ -12,12 +14,14 @@ import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.chic_it_app.Fragments.CustomDialogFragment;
 import com.example.chic_it_app.Model.api.RetrofitClient;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -29,7 +33,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
+
+import org.json.JSONObject;
+
 import java.util.HashMap;
+import java.util.UUID;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -37,7 +45,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class PostActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
+public class PostActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, CustomDialogFragment.DialogListener {
     ImageView close;
     ImageView imageAdded;
     Uri imageUri;
@@ -51,9 +59,14 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
     Spinner type;
     String[] types={"inspiration","For rent - used","For rent - new","For sale - new","For sale - used"};
     String choose;
+    Button add_item;
+    private HashMap<String, HashMap<String, String>> items;
 
+
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        items = new HashMap<>();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
         close = findViewById(R.id.close);
@@ -63,6 +76,30 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
         store = findViewById(R.id.store);
         price = findViewById(R.id.price);
         type = (Spinner) findViewById(R.id.typeSpinner);
+
+//        super.onCreate(savedInstanceState);
+//        setContentView(R.layout.activity_main);
+
+//        openDialogButton = findViewById(R.id.open_dialog_button);
+//        openDialogButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                CustomDialogFragment dialogFragment = new CustomDialogFragment();
+//                dialogFragment.show(getSupportFragmentManager(), "CustomDialogFragment");
+//            }
+//        });
+
+        Button openDialogButton = findViewById(R.id.add_item);
+        openDialogButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CustomDialogFragment dialogFragment = new CustomDialogFragment();
+                dialogFragment.setDialogListener((CustomDialogFragment.DialogListener) PostActivity.this); // Set the listener to the activity
+                dialogFragment.show(getSupportFragmentManager(), "CustomDialogFragment");
+            }
+        });
+
+
 
         close.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,9 +165,13 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
                 public void onComplete(@NonNull Task<Uri> task) {
                     Uri downloadUri = task.getResult();
                     imageUrl = downloadUri.toString();
-                    Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().makePost(imageUrl,
-                            description.getText().toString(), store.getText().toString(), price.getText().toString(),
-                            choose, FirebaseAuth.getInstance().getCurrentUser().getUid());
+                    JSONObject jsonItems = new JSONObject(items);
+                    String jsonString = jsonItems.toString();
+                    Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().addPost(imageUrl,
+                            FirebaseAuth.getInstance().getCurrentUser().getUid(), jsonString);
+//                    Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().makePost(imageUrl,
+//                            description.getText().toString(), store.getText().toString(), price.getText().toString(),
+//                            choose, FirebaseAuth.getInstance().getCurrentUser().getUid());
                     call.enqueue(new Callback<ResponseBody>() {
                         @Override
                         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -182,4 +223,26 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
             finish();
         }
     }
+
+    @Override
+    public void onSave(String name, String store, String price, String more) {
+        // Handle the entered values in the main activity
+        // You can save the values to variables, update UI, or perform any desired actions
+
+        // Example: Log the entered values
+        HashMap<String, String> innerHashMap = new HashMap<>();
+        innerHashMap.put("name", name);
+        innerHashMap.put("store", store);
+        innerHashMap.put("price", price);
+        innerHashMap.put("more", more);
+
+        items.put(UUID.randomUUID().toString(),innerHashMap);
+//
+//        Log.d("MainActivity", "Field 1: " + fieldValue1);
+//        Log.d("MainActivity", "Field 2: " + fieldValue2);
+//        Log.d("MainActivity", "Field 3: " + fieldValue3);
+//        Log.d("MainActivity", "Field 4: " + fieldValue4);
+    }
 }
+
+

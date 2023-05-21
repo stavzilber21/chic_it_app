@@ -59,6 +59,14 @@
             android:src="@mipmap/ic_launcher"
             android:id="@+id/image_added"/>
 
+        <Button
+            android:id="@+id/add_item"
+            android:layout_width="212dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="5dp"
+            android:text="add item" />
+
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

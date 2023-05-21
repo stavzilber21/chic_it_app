@@ -3,11 +3,14 @@ import com.example.chic_it_app.Model.Post;
 import com.example.chic_it_app.Model.User;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Field;
+import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
@@ -30,6 +33,15 @@ public interface API {
     Call<ResponseBody> savePost(
             @Field("uid") String uid,
             @Field("pid") String pid
+    );
+
+    @FormUrlEncoded
+    @POST("addPost")
+    Call<ResponseBody> addPost(
+            @Field("imageurl") String imageurl,
+            @Field("uid") String uid,
+            @Field("items") String items
+            //@FieldMap HashMap<String, HashMap<String, String>> items
     );
 
     @GET("countPost")
