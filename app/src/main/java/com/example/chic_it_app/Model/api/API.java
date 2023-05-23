@@ -2,15 +2,11 @@ package com.example.chic_it_app.Model.api;
 import com.example.chic_it_app.Model.Post;
 import com.example.chic_it_app.Model.User;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Field;
-import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
@@ -44,10 +40,35 @@ public interface API {
             //@FieldMap HashMap<String, HashMap<String, String>> items
     );
 
+
+    @FormUrlEncoded
+    @POST("followUser")
+    Call<ResponseBody> followUser(
+            @Field("uid") String uid,
+            @Field("pid") String pid
+    );
+
+
     @GET("countPost")
     Call<Integer> countPost(
             @Query("uid") String uid
     );
+
+    @GET("getFollowersAndFollowingCount")
+    Call<ResponseBody> getFollowersAndFollowingCount(
+            @Query("uid") String uid
+    );
+
+    @GET("getFollowings")
+    Call<ResponseBody> getFollowings(
+            @Query("uid") String uid
+    );
+
+    @GET("getFollowers")
+    Call<ResponseBody> getFollowers(
+            @Query("uid") String uid
+    );
+
 
     @GET("check")
     Call<ResponseBody> check(
@@ -67,8 +88,18 @@ public interface API {
 
     );
 
+    @GET("checkFollows")
+    Call<ResponseBody> checkFollows(
+            @Query("uid") String uid,
+            @Query("pid") String pid
+
+    );
     @GET("homePosts")
     Call<List<Post>> homePosts(
+    );
+
+    @GET("homeUsers")
+    Call<List<User>> homeUsers(
     );
 
     @FormUrlEncoded
@@ -113,3 +144,4 @@ public interface API {
     );
 
 }
+

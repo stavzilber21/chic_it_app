@@ -2,17 +2,17 @@ package com.example.chic_it_app.Adapter;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.chic_it_app.Fragments.PostDetailFragment;
 import com.example.chic_it_app.Model.Post;
+import com.example.chic_it_app.PostDetailActivity;
 import com.example.chic_it_app.R;
 import com.squareup.picasso.Picasso;
 import java.util.List;
@@ -43,15 +43,25 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>
         final Post post = mPosts.get(position);
         Picasso.get().load(post.getImageurl()).placeholder(R.mipmap.ic_launcher).into(holder.postImage);
 
+//        holder.postImage.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit().putString("postid", post.getPostid()).apply();
+//
+//                ((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction()
+//                        .replace(R.id.fragment_container, new PostDetailFragment()).commit();
+//            }
+//        });
         holder.postImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit().putString("postid", post.getPostid()).apply();
 
-                ((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new PostDetailFragment()).commit();
+                Intent intent = new Intent(mContext, PostDetailActivity.class);
+                mContext.startActivity(intent);
             }
         });
+
 
     }
 

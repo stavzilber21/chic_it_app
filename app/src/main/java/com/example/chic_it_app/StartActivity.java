@@ -23,7 +23,9 @@ public class StartActivity extends AppCompatActivity {
 
         //if the user already exist in firebase
         if (FirebaseAuth.getInstance().getCurrentUser() != null){
-            startActivity(new Intent(StartActivity.this , MainActivity.class));
+//            startActivity(new Intent(StartActivity.this , SearchFragment.class));
+            Intent intent = new Intent(StartActivity.this, SearchActivity.class);
+            startActivity(intent);
             finish();
         }
     }

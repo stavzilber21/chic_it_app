@@ -63,6 +63,7 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
     private HashMap<String, HashMap<String, String>> items;
 
 
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,7 +105,7 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
         close.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(PostActivity.this , CreatingcontentActivity.class));
+                startActivity(new Intent(PostActivity.this , SearchActivity.class));
                 finish();
             }
         });
@@ -172,6 +173,7 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
 //                    Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().makePost(imageUrl,
 //                            description.getText().toString(), store.getText().toString(), price.getText().toString(),
 //                            choose, FirebaseAuth.getInstance().getCurrentUser().getUid());
+
                     call.enqueue(new Callback<ResponseBody>() {
                         @Override
                         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -185,7 +187,7 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
                     });
                     progressDialog.dismiss();
                     Toast.makeText(PostActivity.this, "The post has been uploaded!", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(PostActivity.this , CreatingcontentActivity.class));
+                    startActivity(new Intent(PostActivity.this , SearchActivity.class));
                     finish();
                 }
             }).addOnFailureListener(new OnFailureListener() {
@@ -219,7 +221,7 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
             imageAdded.setImageURI(imageUri);
         } else {
             Toast.makeText(this, "Try again!", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(PostActivity.this , CreatingcontentActivity.class));
+            startActivity(new Intent(PostActivity.this , SearchActivity.class));
             finish();
         }
     }
@@ -244,5 +246,6 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
 //        Log.d("MainActivity", "Field 4: " + fieldValue4);
     }
 }
+
 
 

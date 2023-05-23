@@ -1,12 +1,10 @@
-package com.example.chic_it_app.Fragments;
-
+package com.example.chic_it_app;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -14,15 +12,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.chic_it_app.Adapter.PostAdapter;
+import com.example.chic_it_app.Model.Post;
 import com.example.chic_it_app.Model.User;
 import com.example.chic_it_app.Model.api.RetrofitClient;
+import com.example.chic_it_app.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.example.chic_it_app.Adapter.PostAdapter;
-import com.example.chic_it_app.Model.Post;
-import com.example.chic_it_app.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +29,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class PostDetailFragment extends Fragment {
+public class PostDetailActivity extends AppCompatActivity {
 
     private String postId;
     private RecyclerView recyclerView;
@@ -40,18 +38,18 @@ public class PostDetailFragment extends Fragment {
 
     @SuppressLint("MissingInflatedId")
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_post_detail, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_post_detail);
 
-        postId = getContext().getSharedPreferences("PREFS", Context.MODE_PRIVATE).getString("postid", "none");
+        postId = getSharedPreferences("PREFS", Context.MODE_PRIVATE).getString("postid", "none");
 
-        recyclerView = view.findViewById(R.id.recycler_view);
+        recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         postList = new ArrayList<>();
-        postAdapter = new PostAdapter(getContext(), postList);
+        postAdapter = new PostAdapter(this, postList);
         recyclerView.setAdapter(postAdapter);
 
         //send post details
@@ -70,6 +68,5 @@ public class PostDetailFragment extends Fragment {
 
             }
         });
-        return view;
     }
 }

@@ -9,7 +9,7 @@ public class User {
     private String email;
     private String username;
     private String imageurl;
-    private String id;
+    private String uid;
     private String gender;
     private String size;
     private String phone;
@@ -17,12 +17,12 @@ public class User {
     public User() {
     }
 
-    public User(String name, String email, String username, String imageurl, String id,String gender,String size) {
+    public User(String name, String email, String username, String imageurl, String uid,String gender,String size) {
         this.fullname = name;
         this.email = email;
         this.username = username;
         this.imageurl = imageurl;
-        this.id = id;
+        this.uid = uid;
         this.gender = gender;
         this.size = size;
     }
@@ -60,11 +60,11 @@ public class User {
     }
 
     public String getId() {
-        return id;
+        return uid;
     }
 
     public void setId(String id) {
-        this.id = id;
+        this.uid = id;
     }
 
     public String getGender() {

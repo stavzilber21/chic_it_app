@@ -1,6 +1,7 @@
 package com.example.chic_it_app.Adapter;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,25 +9,27 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.chic_it_app.Fragments.ProfileFragment;
-import com.example.chic_it_app.MainActivity;
 import com.example.chic_it_app.Model.User;
+import com.example.chic_it_app.Model.api.RetrofitClient;
+import com.example.chic_it_app.ProfileActivity;
 import com.example.chic_it_app.R;
+import com.example.chic_it_app.StartActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
+
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>{
 
@@ -34,6 +37,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>{
     private List<User> mUsers;
     private boolean isFargment;
     private FirebaseUser firebaseUser;
+
+
+
 
     // function to enter the data
     public UserAdapter(Context mContext, List<User> mUsers, boolean isFargment)
@@ -72,59 +78,82 @@ Since our widgets are defined in a layout resource, we will need a LayoutInflate
         holder.btnFollow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (holder.btnFollow.getText().toString().equals(("follow"))){
-                    FirebaseDatabase.getInstance().getReference().child("Follow").
-                            child((firebaseUser.getUid())).child("following").child(user.getId()).setValue(true);
+                Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().followUser(firebaseUser.getUid(),user.getId());
+                call.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        notifyDataSetChanged();
+                        Log.d("followUser", "success");
 
-                    FirebaseDatabase.getInstance().getReference().child("Follow").
-                            child(user.getId()).child("followers").child(firebaseUser.getUid()).setValue(true);
+                    }
 
-                    addNotification(user.getId());
-                } else {
-                    FirebaseDatabase.getInstance().getReference().child("Follow").
-                            child((firebaseUser.getUid())).child("following").child(user.getId()).removeValue();
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        Log.d("followUser", t.getMessage());
+                    }
+                });
 
-                    FirebaseDatabase.getInstance().getReference().child("Follow").
-                            child(user.getId()).child("followers").child(firebaseUser.getUid()).removeValue();
-                }
             }
         });
 
+//        holder.itemView.setOnClickListener(new View.OnClickListener() {
+////            @Override
+////            public void onClick(View v) {
+////                if (isFargment) {
+////                    mContext.getSharedPreferences("PROFILE", Context.MODE_PRIVATE).edit().putString("profileId", user.getId()).apply();
+////
+////                    ((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ProfileFragment()).commit();
+////                } else {
+////                    Intent intent = new Intent(mContext, MainActivity.class);
+////                    intent.putExtra("publisherId", user.getId());
+////                    mContext.startActivity(intent);
+////                }
+////            }
+////        });
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (isFargment) {
                     mContext.getSharedPreferences("PROFILE", Context.MODE_PRIVATE).edit().putString("profileId", user.getId()).apply();
 
-                    ((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ProfileFragment()).commit();
+                    Intent intent = new Intent(mContext, ProfileActivity.class);
+                    mContext.startActivity(intent);
                 } else {
-                    Intent intent = new Intent(mContext, MainActivity.class);
+                    Intent intent = new Intent(mContext, StartActivity.class);
                     intent.putExtra("publisherId", user.getId());
                     mContext.startActivity(intent);
                 }
             }
         });
 
+
     }
 
     private void isFollowed(final String id, final Button btnFollow) {
-
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Follow").child(firebaseUser.getUid())
-                .child("following");
-        reference.addValueEventListener(new ValueEventListener() {
+        Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().checkFollows(firebaseUser.getUid(),id);
+        call.enqueue(new Callback<ResponseBody>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.child(id).exists())
-                    btnFollow.setText("following");
-                else
-                    btnFollow.setText("follow");
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                try {
+                    String res = response.body().string();
+                    if(res.equals("following")) {
+                        btnFollow.setText("following");
+
+                    } else {
+                        btnFollow.setText("follow");
+                    }
+                } catch (IOException e) {
+
+                }
+
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
 
             }
         });
+
 
     }
 

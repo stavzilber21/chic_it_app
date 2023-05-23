@@ -7,27 +7,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.chic_it_app.CreatingcontentActivity;
-import com.example.chic_it_app.Fragments.HomeFragment;
-import com.example.chic_it_app.Fragments.PostDetailFragment;
-import com.example.chic_it_app.LoginActivity;
-import com.example.chic_it_app.MainActivity;
 import com.example.chic_it_app.Model.User;
 import com.example.chic_it_app.Model.api.RetrofitClient;
-import com.example.chic_it_app.PostActivity;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.example.chic_it_app.PostDetailActivity;
+import com.example.chic_it_app.ProfileActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -35,13 +26,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import com.example.chic_it_app.Fragments.ProfileFragment;
 import com.example.chic_it_app.Model.Post;
 import com.example.chic_it_app.R;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 
 import okhttp3.ResponseBody;
@@ -164,6 +153,17 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
             }
         });
 
+//        holder.imageProfile.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                mContext.getSharedPreferences("PROFILE", Context.MODE_PRIVATE)
+//                        .edit().putString("profileId", post.getPublisher()).apply();
+//
+//                ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction()
+//                        .replace(R.id.fragment_container, new ProfileFragment()).commit();
+//            }
+//        });
+
         /*If a user clicks on the button imageProfile we display the profile picture*/
         holder.imageProfile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -171,10 +171,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
                 mContext.getSharedPreferences("PROFILE", Context.MODE_PRIVATE)
                         .edit().putString("profileId", post.getPublisher()).apply();
 
-                ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new ProfileFragment()).commit();
+                Intent intent = new Intent(mContext, ProfileActivity.class);
+                mContext.startActivity(intent);
             }
         });
+
 
         /*If a user clicks on the button username we display the profile of creator of post*/
         holder.username.setOnClickListener(new View.OnClickListener() {
@@ -183,10 +184,21 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
                 mContext.getSharedPreferences("PROFILE", Context.MODE_PRIVATE)
                         .edit().putString("profileId", post.getPublisher()).apply();
 
-                ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new ProfileFragment()).commit();
+                Intent intent = new Intent(mContext, ProfileActivity.class);
+                mContext.startActivity(intent);
             }
         });
+
+//        holder.username.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                mContext.getSharedPreferences("PROFILE", Context.MODE_PRIVATE)
+//                        .edit().putString("profileId", post.getPublisher()).apply();
+//
+//                ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction()
+//                        .replace(R.id.fragment_container, new ProfileFragment()).commit();
+//            }
+//        });
 
         /*If a user clicks on the button postImage It goes to this post's page only. */
         holder.postImage.setOnClickListener(new View.OnClickListener() {
@@ -194,10 +206,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
             public void onClick(View v) {
                 mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit().putString("postid", post.getPostid()).apply();
 
-                ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new PostDetailFragment()).commit();
+                Intent intent = new Intent(mContext, PostDetailActivity.class);
+                mContext.startActivity(intent);
             }
         });
+
 
         /* If a user clicks on the button contact_us we send it to that seller's WhatsApp*/
         holder.contact_us.setOnClickListener(new View.OnClickListener() {
@@ -216,7 +229,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
                         Intent intent = new Intent(Intent.ACTION_VIEW);
                         intent.setData(Uri.parse(Url));
                         mContext.startActivity(intent);
-
 
                     }
 
