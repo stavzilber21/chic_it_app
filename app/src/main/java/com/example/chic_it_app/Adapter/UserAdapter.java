@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.chic_it_app.Model.Post;
 import com.example.chic_it_app.Model.User;
 import com.example.chic_it_app.Model.api.RetrofitClient;
 import com.example.chic_it_app.ProfileActivity;
@@ -47,6 +48,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>{
         this.mContext = mContext;
         this.mUsers = mUsers;
         this.isFargment = isFargment;
+    }
+    public void setFilter(List<User> userList) {
+        this.mUsers = userList;
+        notifyDataSetChanged();
     }
 /*to create instances of a ViewHolder , including working with the ViewHolder to set up the widgets.
 Since our widgets are defined in a layout resource, we will need a LayoutInflater to accomplish this*/

@@ -234,38 +234,29 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-public class SearchActivity extends AppCompatActivity {
+public class UserSearch extends AppCompatActivity {
     private BottomNavigationView bottomNavigationView;
     private RecyclerView recyclerView;
-    private List<Post> mPosts;
-    private PostAdapter postAdapter;
     private SearchView searchView;
-    private ImageView logout;
+    private List<User> mUsers;
+    private UserAdapter userAdapter;
 
     @SuppressLint("MissingInflatedId")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search);
-//        getSupportFragmentManager().beginTransaction()
-//                .add(android.R.id.content, new SearchFragment()).commit();
+        setContentView(R.layout.activity_user_search);
 
-        logout = findViewById(R.id.logOut);
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog_exit();
-            }
-        });
+
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mPosts = new ArrayList<>();
-        postAdapter = new PostAdapter(this , mPosts);
-        recyclerView.setAdapter(postAdapter);
+        mUsers = new ArrayList<>();
+        userAdapter = new UserAdapter(this , mUsers,true);
+        recyclerView.setAdapter(userAdapter);
         searchView = findViewById(R.id.searchView);
         searchView.clearFocus();
-        readPosts();
+        readUsers();
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -273,18 +264,18 @@ public class SearchActivity extends AppCompatActivity {
                 switch (menuItem.getItemId()){
                     // if you what to upload a new post
                     case R.id.nav_add :
-                        startActivity(new Intent(SearchActivity.this , PostActivity.class));
+                        startActivity(new Intent(UserSearch.this , PostActivity.class));
                         break;
                     case R.id.nav_search:
-                        startActivity(new Intent(SearchActivity.this , UserSearch.class));
+                        startActivity(new Intent(UserSearch.this , UserSearch.class));
                         break;
                     //if you want to search posts by description
                     case R.id.nav_home :
-                        startActivity(new Intent(SearchActivity.this , SearchActivity.class));
+                        startActivity(new Intent(UserSearch.this , SearchActivity.class));
                         break;
                     //to see your profile
                     case R.id.nav_profile :
-                        startActivity(new Intent(SearchActivity.this , ProfileActivity.class));
+                        startActivity(new Intent(UserSearch.this , ProfileActivity.class));
                         break;
                 }
 
@@ -298,122 +289,46 @@ public class SearchActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                filterPost(newText);
+                searchUser(newText);
                 return true;
             }
         });
 
 
     }
-
-
-    private void readPosts() {
-        Call<List<Post>> call = RetrofitClient.getInstance().getAPI().homePosts();
-        call.enqueue(new Callback<List<Post>>() {
+    private void readUsers() {
+        Call<List<User>> call = RetrofitClient.getInstance().getAPI().homeUsers();
+        call.enqueue(new Callback<List<User>>() {
             @Override
-            public void onResponse(Call<List<Post>> call, Response<List<Post>> response) {
-                mPosts.clear();
-                List<Post> postsList = response.body();
-                if (postsList != null) {
-                    mPosts.addAll(postsList);
-                    Collections.reverse(mPosts);
-                    postAdapter.notifyDataSetChanged();
+            public void onResponse(Call<List<User>> call, Response<List<User>> response) {
+                mUsers.clear();
+                List<User> usersList = response.body();
+                if (usersList != null) {
+                    mUsers.addAll(usersList);
+                    userAdapter.notifyDataSetChanged();
                 }
             }
 
             @Override
-            public void onFailure(Call<List<Post>> call, Throwable t) {
+            public void onFailure(Call<List<User>> call, Throwable t) {
 
             }
+
         });
+
+
     }
-
-    private void filterPost(String text) {
-        List<Post> filterList = new ArrayList<>();
-        for(Post post : mPosts){
-            if(post.getDescription().contains(text) || post.getStore().contains(text) ){
-                filterList.add(post);
+    private void searchUser (String s) {
+        List<User> filterList = new ArrayList<>();
+        for(User user : mUsers){
+            if(user.getUsername().contains(s)){
+                filterList.add(user);
             }
-            else if(text.contains("-") && text.indexOf("-")!=text.length()-1){
-                if(text.endsWith("$")){
-                    String text_new = text.replace("$","");
-                    text = text_new;
-                }
-                if(text.endsWith("₪")){
-                    String text_new = text.replace("₪","");
-                    text = text_new;
-                }
-                int x = text.indexOf("-");
-                String first = text.substring(0,x);
-                String second = text.substring(x+1,text.length());
-                String p = post.getPrice();
-                int Price = Integer.decode(p);
-                if(Integer.valueOf(first) <=Integer.valueOf(second)){
-                    if(Price>= Integer.valueOf(first)&&Price<=Integer.valueOf(second)){
-                        filterList.add(post);
-                    }
-                }
-                if(Integer.valueOf(first) >=Integer.valueOf(second)){
-                    if(Price<=Integer.valueOf(first)&& Price>=Integer.valueOf(second)){
-                        filterList.add(post);
-                    }
-                }
-            }
-            //if you search price from 0 until your text number
-            else if(!text.contains("-") && Character.isDigit(text.charAt(0))){
-                //if this it price $ - just posts with $
-                if(text.endsWith("$")){
-                    String text_new = text.replace("$","");
-                    text = text_new;
-                    if(post.getPrice().endsWith("$")){
-                        post.getPrice().replace("$","");
-                        if(Integer.valueOf(post.getPrice())>= 0 && Integer.valueOf(post.getPrice())<=Integer.valueOf(text)){
-                            filterList.add(post);
-                        }
-                    }
-                }
-                //if this it price ₪- just posts with ₪
-                else if(text.endsWith("₪")){
-                    String text_new = text.replace("₪","");
-                    text = text_new;
-                    if(post.getPrice().endsWith("₪")){
-                        post.getPrice().replace("₪","");
-                        if(Integer.valueOf(post.getPrice())>= 0 && Integer.valueOf(post.getPrice())<=Integer.valueOf(text)){
-                            filterList.add(post);
-                        }
-                    }
-                }
-                //if you serach price without $ or ₪
-                else if(Integer.valueOf(post.getPrice())>= 0 && Integer.valueOf(post.getPrice())<=Integer.valueOf(text)){
-                    filterList.add(post);
-                }
-            }
-
         }
-        //if(!filterList.isEmpty()){
-        postAdapter.setFilter(filterList);
-        //}
+        userAdapter.setFilter(filterList);
     }
 
-    //dialog that ask the user before you click.
-    public void dialog_exit() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setCancelable(true);
-        builder.setTitle("you sure that you want to exit?");
-        builder.setMessage("");
-        builder.setPositiveButton("yes please", (dialog, which) ->
-        {
-            Toast.makeText(SearchActivity.this, "bye-bye!", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(SearchActivity.this , LoginActivity.class));
-        });
 
-        builder.setNegativeButton("no", (dialog, which) -> {
-            Toast.makeText(SearchActivity.this, "good to have you back!", Toast.LENGTH_SHORT).show();
-        });
-        AlertDialog dialog = builder.create();
-        dialog.show();
-
-    }
 
 
 }
