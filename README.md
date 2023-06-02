@@ -17,5 +17,6 @@ To "like" a post, this action adds this look to "looks I liked" and so it can be
 Despite all the information on social networks on the Internet, our application gives a more accurate answer.
 You just have to scroll and that's how you are exposed to lots of looks that you can just go and buy.
 
+# Poster
 ![poster5](https://github.com/stavzilber21/chic_it_app/assets/93096648/b71d674e-05b3-4c92-9ab9-da90e0ced0a0)
 
