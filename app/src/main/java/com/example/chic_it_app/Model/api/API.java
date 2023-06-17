@@ -24,6 +24,11 @@ public interface API {
             @Query("pid") String pid
     );
 
+    @GET("getPostItems")
+    Call<ResponseBody> getPostItems(
+            @Query("pid") String pid
+    );
+
     @FormUrlEncoded
     @POST("savePost")
     Call<ResponseBody> savePost(
@@ -36,7 +41,8 @@ public interface API {
     Call<ResponseBody> addPost(
             @Field("imageurl") String imageurl,
             @Field("uid") String uid,
-            @Field("items") String items
+            @Field("items") String items,
+            @Field("type") String type
             //@FieldMap HashMap<String, HashMap<String, String>> items
     );
 

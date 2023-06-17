@@ -169,7 +169,7 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
                     JSONObject jsonItems = new JSONObject(items);
                     String jsonString = jsonItems.toString();
                     Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().addPost(imageUrl,
-                            FirebaseAuth.getInstance().getCurrentUser().getUid(), jsonString);
+                            FirebaseAuth.getInstance().getCurrentUser().getUid(), jsonString, choose);
 //                    Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().makePost(imageUrl,
 //                            description.getText().toString(), store.getText().toString(), price.getText().toString(),
 //                            choose, FirebaseAuth.getInstance().getCurrentUser().getUid());

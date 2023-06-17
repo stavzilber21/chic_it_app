@@ -125,8 +125,8 @@ public class ProfileActivity extends AppCompatActivity {
                 }
             }
         });
-//        followers.setText("0");
-//        following.setText("2");
+        followers.setText("3");
+        following.setText("2");
         recyclerView.setVisibility(View.VISIBLE);
         recyclerViewLikes.setVisibility(View.GONE);
 

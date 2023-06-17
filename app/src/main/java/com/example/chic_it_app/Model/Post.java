@@ -1,7 +1,9 @@
 package com.example.chic_it_app.Model;
 
+import java.util.HashMap;
+
 public class Post {
-    //This class holds the post object and all its fields.
+    // This class holds the post object and all its fields.
 
     private String description;
     private String store;
@@ -14,7 +16,7 @@ public class Post {
     public Post() {
     }
 
-    public Post(String description, String imageurl, String postid, String publisher,String store, String price,String type) {
+    public Post(String description, String imageurl, String postid, String publisher, String store, String price, String type) {
         this.description = description;
         this.imageurl = imageurl;
         this.postid = postid;
@@ -79,4 +81,5 @@ public class Post {
     public void setType(String type) {
         this.type = type;
     }
+
 }

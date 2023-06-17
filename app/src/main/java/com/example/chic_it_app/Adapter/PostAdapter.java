@@ -1,6 +1,7 @@
 package com.example.chic_it_app.Adapter;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
@@ -128,20 +129,20 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
                 builder.setTitle("you sure that you want to delete?");
                 builder.setMessage("");
                 builder.setPositiveButton("yes", (dialog, which) -> {
-                FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
-                Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().deletePost(post.getPostid(),post.getPublisher(),fUser.getUid());
-                call.enqueue(new Callback<ResponseBody>() {
-                    @Override
-                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                        notifyDataSetChanged();
-                        Toast.makeText(mContext, "deleted!", Toast.LENGTH_SHORT).show();
-                    }
+                    FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
+                    Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().deletePost(post.getPostid(),post.getPublisher(),fUser.getUid());
+                    call.enqueue(new Callback<ResponseBody>() {
+                        @Override
+                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                            notifyDataSetChanged();
+                            Toast.makeText(mContext, "deleted!", Toast.LENGTH_SHORT).show();
+                        }
 
-                    @Override
-                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        @Override
+                        public void onFailure(Call<ResponseBody> call, Throwable t) {
 
-                    }
-                });
+                        }
+                    });
                 });
 
                 builder.setNegativeButton("no", (dialog, which) ->
@@ -188,6 +189,48 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
                 mContext.startActivity(intent);
             }
         });
+
+        holder.item.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().getPostItems(post.getPostid());
+                call.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        ResponseBody itemsList = response.body();
+                        String it = null;
+                        try {
+                            it = itemsList.string();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        System.out.println("stav: "+it);
+                        if (it != null) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                            builder.setTitle("Items");
+                            builder.setMessage(it);
+                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                            AlertDialog dialog = builder.create();
+                            dialog.show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        // Handle the failure case
+                        // ...
+                    }
+                });
+            }
+        });
+
+
+
 
 //        holder.username.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -260,6 +303,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
         TextView price;
         TextView store;
         TextView type;
+        TextView item;
 
 
         public Viewholder(@NonNull View itemView) {
@@ -275,6 +319,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
             store = itemView.findViewById(R.id.store);
             price = itemView.findViewById(R.id.price);
             type = itemView.findViewById(R.id.type);
+            item = itemView.findViewById(R.id.item);
 
         }
     }
@@ -307,5 +352,26 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
 
             }
         });
+
     }
+
+//    private String getItem(String postId){
+//        Call<String> call = RetrofitClient.getInstance().getAPI().getPostItems(postId);
+//        call.enqueue(new Callback<String>() {
+//            @Override
+//            public void onResponse(Call<String> call, Response<String> response) {
+////                ResponseBody itemsList = response.body();
+//                String it = response.body();
+//                if (it != null) {
+//                    return it;
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<String> call, Throwable t) {
+//                // Handle the failure case
+//                // ...
+//            }
+//        });
+//    }
 }
