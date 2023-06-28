@@ -1,9 +1,14 @@
 package com.example.chic_it_app.Adapter;
 
+import static android.graphics.Typeface.BOLD;
+
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +18,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.chic_it_app.Model.User;
@@ -71,9 +78,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
 
         final Post post = mPosts.get(position);
         Picasso.get().load(post.getImageurl()).into(holder.postImage);
-        holder.description.setText(post.getDescription());
-        holder.price.setText(post.getPrice());
-        holder.store.setText(post.getStore());
+//        holder.description.setText(post.getDescription());
+//        holder.price.setText(post.getPrice());
+//        holder.store.setText(post.getStore());
         holder.type.setText(post.getType());
 
         //to display the username of publisher and his image profile
@@ -190,11 +197,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
             }
         });
 
+
         holder.item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().getPostItems(post.getPostid());
                 call.enqueue(new Callback<ResponseBody>() {
+                    @RequiresApi(api = Build.VERSION_CODES.M)
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                         ResponseBody itemsList = response.body();
@@ -204,11 +213,33 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                        System.out.println("stav: "+it);
                         if (it != null) {
                             AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
                             builder.setTitle("Items");
-                            builder.setMessage(it);
+                            TextView messageTextView = new TextView(mContext);
+                            messageTextView.setTextAppearance(android.R.style.TextAppearance_Medium);
+//                            messageTextView.setTextColor(Color.BLUE); // Set the text color to blue
+                            messageTextView.setBackgroundColor(Color.parseColor("#FFC0CB")); // Pink color
+                            messageTextView.setPadding(16, 16, 16, 16); // Adjust padding as needed
+                            messageTextView.setTypeface(null, Typeface.BOLD); // Set the text style to bold
+                            messageTextView.setTypeface(ResourcesCompat.getFont(mContext, R.font.calibrib));
+
+                            // Split the items based on "},"
+                            String[] itemList = it.split("\\},");
+                            StringBuilder formattedText = new StringBuilder();
+                            for (int i = 0; i < itemList.length; i++) {
+                                String item = itemList[i].trim();
+                                if (item.endsWith("}")) {
+                                    item = item.substring(0, item.length() - 1); // Remove the trailing "}"
+                                }
+                                formattedText.append(formatItem(item));
+                                if (i < itemList.length - 1) {
+                                    formattedText.append("\n\n"); // Add a double line break after each item
+                                }
+                            }
+
+                            messageTextView.setText(formattedText.toString());
+                            builder.setView(messageTextView);
                             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
@@ -299,11 +330,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
         public TextView username;
         public TextView contact_us;
         public TextView author;
-        TextView description;
-        TextView price;
-        TextView store;
+//        TextView description;
+//        TextView price;
+//        TextView store;
         TextView type;
-        TextView item;
+        ImageView item;
 
 
         public Viewholder(@NonNull View itemView) {
@@ -315,9 +346,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
             delete = itemView.findViewById(R.id.delete);
             username = itemView.findViewById(R.id.username);
             contact_us = itemView.findViewById(R.id.contact_us);
-            description = itemView.findViewById(R.id.description);
-            store = itemView.findViewById(R.id.store);
-            price = itemView.findViewById(R.id.price);
+//            description = itemView.findViewById(R.id.description);
+//            store = itemView.findViewById(R.id.store);
+//            price = itemView.findViewById(R.id.price);
             type = itemView.findViewById(R.id.type);
             item = itemView.findViewById(R.id.item);
 
@@ -353,6 +384,34 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
             }
         });
 
+    }
+    private String formatItem(String item) {
+        String[] itemDetails = item.split(",");
+        StringBuilder formattedItem = new StringBuilder();
+        for (String detail : itemDetails) {
+            String[] detailPair = detail.split(":");
+            if (detailPair.length == 2) {
+                String key = detailPair[0].trim();
+                String value = detailPair[1].trim();
+                if (key.equalsIgnoreCase("name")) {
+                    formattedItem.append("Name: ").append(value).append("\n");
+                } else if (key.equalsIgnoreCase("store")) {
+                    formattedItem.append("Store: ").append(value).append("\n");
+                } else if (key.equalsIgnoreCase("price")) {
+                    formattedItem.append("Price: ").append(value).append("\n");
+                } else {
+                    formattedItem.append(detail).append("\n");
+                }
+            } else {
+                formattedItem.append(detail).append("\n");
+            }
+        }
+        return formattedItem.toString();
+    }
+
+    private String formatDetail(String detail) {
+        detail = detail.replaceAll("\\{", " ").replaceAll("\\d", " ");
+        return detail;
     }
 
 //    private String getItem(String postId){

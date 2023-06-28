@@ -54,8 +54,8 @@
 
             <ImageView
                 android:id="@+id/post_image"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_width="415dp"
+                android:layout_height="391dp"
                 app:layout_constraintDimensionRatio="1:1"
                 tools:ignore="MissingConstraints" />
 
@@ -118,42 +118,48 @@
 
         </RelativeLayout>
 
-        <TextView
+        <ImageView
             android:id="@+id/item"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:text="item"
-            android:textColor="@color/colorAccent" />
+            android:layout_width="match_parent"
+            android:layout_height="75dp"
+            android:src="@drawable/item" />
+        <!--        <TextView-->
+<!--            android:id="@+id/item"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginStart="10dp"-->
+<!--            android:layout_marginTop="5dp"-->
+<!--            android:layout_marginBottom="5dp"-->
+<!--            android:text="item"-->
+<!--            android:textStyle="bold"-->
+<!--            android:textColor="@color/colorAccent" />-->
 
-        <TextView
-            android:id="@+id/description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:textColor="@color/colorAccent" />
+<!--        <TextView-->
+<!--            android:id="@+id/description"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginStart="10dp"-->
+<!--            android:layout_marginTop="5dp"-->
+<!--            android:layout_marginBottom="5dp"-->
+<!--            android:textColor="@color/colorAccent" />-->
 
-        <TextView
-            android:id="@+id/store"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:textColor="@color/colorAccent" />
+<!--        <TextView-->
+<!--            android:id="@+id/store"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginStart="10dp"-->
+<!--            android:layout_marginTop="5dp"-->
+<!--            android:layout_marginBottom="5dp"-->
+<!--            android:textColor="@color/colorAccent" />-->
 
-        <TextView
-            android:id="@+id/price"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:textColor="@color/colorAccent" />
+<!--        <TextView-->
+<!--            android:id="@+id/price"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginStart="10dp"-->
+<!--            android:layout_marginTop="5dp"-->
+<!--            android:layout_marginBottom="5dp"-->
+<!--            android:textColor="@color/colorAccent" />-->
 
 
 

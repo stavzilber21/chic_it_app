@@ -250,13 +250,13 @@ public class SearchActivity extends AppCompatActivity {
 //        getSupportFragmentManager().beginTransaction()
 //                .add(android.R.id.content, new SearchFragment()).commit();
 
-        logout = findViewById(R.id.logOut);
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog_exit();
-            }
-        });
+//        logout = findViewById(R.id.logOut);
+//        logout.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                dialog_exit();
+//            }
+//        });
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -278,6 +278,8 @@ public class SearchActivity extends AppCompatActivity {
                     case R.id.nav_search:
                         startActivity(new Intent(SearchActivity.this , UserSearch.class));
                         break;
+                    case R.id.nav_logout:
+                        dialog_exit();
                     //if you want to search posts by description
                     case R.id.nav_home :
                         startActivity(new Intent(SearchActivity.this , SearchActivity.class));
@@ -298,7 +300,7 @@ public class SearchActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                filterPost(newText);
+//                filterPost(newText);
                 return true;
             }
         });

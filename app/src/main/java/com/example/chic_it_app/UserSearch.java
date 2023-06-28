@@ -269,6 +269,8 @@ public class UserSearch extends AppCompatActivity {
                     case R.id.nav_search:
                         startActivity(new Intent(UserSearch.this , UserSearch.class));
                         break;
+                    case R.id.nav_logout:
+                        dialog_exit();
                     //if you want to search posts by description
                     case R.id.nav_home :
                         startActivity(new Intent(UserSearch.this , SearchActivity.class));
@@ -326,6 +328,25 @@ public class UserSearch extends AppCompatActivity {
             }
         }
         userAdapter.setFilter(filterList);
+    }
+
+    public void dialog_exit() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setTitle("you sure that you want to exit?");
+        builder.setMessage("");
+        builder.setPositiveButton("yes please", (dialog, which) ->
+        {
+            Toast.makeText(UserSearch.this, "bye-bye!", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(UserSearch.this , LoginActivity.class));
+        });
+
+        builder.setNegativeButton("no", (dialog, which) -> {
+            Toast.makeText(UserSearch.this, "good to have you back!", Toast.LENGTH_SHORT).show();
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
     }
 
 
