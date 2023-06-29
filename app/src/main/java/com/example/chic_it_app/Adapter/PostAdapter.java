@@ -291,30 +291,31 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
             @Override
             public void onClick(View view) {
                 String[] user_phone = new String[1];
-                FirebaseDatabase.getInstance().getReference().child("Users").child(post.getPublisher()).addValueEventListener(new ValueEventListener() {
+                Call<User> call = RetrofitClient.getInstance().getAPI().getUserDetails(post.getPublisher());
+                call.enqueue(new Callback<User>() {
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        User user = dataSnapshot.getValue(User.class);
+                    public void onResponse(Call<User> call, Response<User> response) {
+                        User user = response.body();
                         user_phone[0] = user.getPhone();
-
                         String a = "https://wa.me/";
-                        String b = "?text=Hi! I'm from chic it, I want ask you about your look " + post.getDescription();
+                        String b = "?text=Hi! I'm from chic it, I want ask you about your look.";
                         String Url = a + user_phone[0] + b;
                         Intent intent = new Intent(Intent.ACTION_VIEW);
                         intent.setData(Uri.parse(Url));
                         mContext.startActivity(intent);
-
                     }
 
                     @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                    public void onFailure(Call<User> call, Throwable t) {
+                        Log.d("Fail", t.getMessage());
                     }
                 });
 
             }
         });
     }
+
+
 
     @Override
     public int getItemCount() {
