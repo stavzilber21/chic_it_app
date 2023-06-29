@@ -52,9 +52,9 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
     StorageReference storageReference;
     ProgressDialog progressDialog;
     String imageUrl;
-    EditText description;
-    EditText store;
-    EditText price;
+//    EditText description;
+//    EditText store;
+//    EditText price;
     TextView post;
     Spinner type;
     String[] types={"inspiration","For rent - used","For rent - new","For sale - new","For sale - used"};
@@ -73,9 +73,9 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
         close = findViewById(R.id.close);
         imageAdded = findViewById(R.id.image_added);
         post = findViewById(R.id.post);
-        description = findViewById(R.id.description);
-        store = findViewById(R.id.store);
-        price = findViewById(R.id.price);
+//        description = findViewById(R.id.description);
+//        store = findViewById(R.id.store);
+//        price = findViewById(R.id.price);
         type = (Spinner) findViewById(R.id.typeSpinner);
 
 //        super.onCreate(savedInstanceState);
@@ -169,7 +169,7 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
                     JSONObject jsonItems = new JSONObject(items);
                     String jsonString = jsonItems.toString();
                     Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().addPost(imageUrl,
-                            FirebaseAuth.getInstance().getCurrentUser().getUid(), jsonString);
+                            FirebaseAuth.getInstance().getCurrentUser().getUid(), jsonString, choose);
 //                    Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().makePost(imageUrl,
 //                            description.getText().toString(), store.getText().toString(), price.getText().toString(),
 //                            choose, FirebaseAuth.getInstance().getCurrentUser().getUid());
@@ -239,11 +239,7 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
         innerHashMap.put("more", more);
 
         items.put(UUID.randomUUID().toString(),innerHashMap);
-//
-//        Log.d("MainActivity", "Field 1: " + fieldValue1);
-//        Log.d("MainActivity", "Field 2: " + fieldValue2);
-//        Log.d("MainActivity", "Field 3: " + fieldValue3);
-//        Log.d("MainActivity", "Field 4: " + fieldValue4);
+
     }
 }
 

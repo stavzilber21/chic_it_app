@@ -28,7 +28,7 @@
                     android:maxLines="1"
                     android:textStyle="bold"
                     android:id="@+id/username"
-                    android:textColor="@color/colorPrimary"/>
+                    android:textColor="#2CB0EC"/>
 
 <!--                <ImageView-->
 <!--                    android:layout_width="wrap_content"-->
@@ -89,7 +89,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
-                                android:textColor="@color/colorPrimary"
+                                android:textColor="#2CB0EC"
                                 android:textSize="18sp"
                                 android:textStyle="bold" />
 
@@ -112,7 +112,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
-                                android:textColor="@color/colorPrimary"
+                                android:textColor="#2CB0EC"
                                 android:textSize="18sp"
                                 android:textStyle="bold" />
 
@@ -135,7 +135,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
-                                android:textColor="@color/colorPrimary"
+                                android:textColor="#2CB0EC"
                                 android:textSize="18sp"
                                 android:textStyle="bold" />
 
@@ -175,7 +175,7 @@
                     android:id="@+id/fullname"
                     android:textStyle="bold"
                     android:textSize="18sp"
-                    android:textColor="@color/colorPrimary"/>
+                    android:textColor="#2CB0EC"/>
 
 <!--                <TextView-->
 <!--                    android:layout_width="wrap_content"-->

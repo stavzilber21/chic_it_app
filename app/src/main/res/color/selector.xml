@@ -4,4 +4,5 @@
 <!--        android:state_selected="true"/>-->
     <item android:color="@color/colorAccent"/>
     <item android:color="@color/colorPrimary"/>
+    <item android:color="#2CB0EC"/>
 </selector>

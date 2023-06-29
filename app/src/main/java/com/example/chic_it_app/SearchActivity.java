@@ -206,18 +206,25 @@
 package com.example.chic_it_app;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.chic_it_app.Adapter.PostAdapter;
@@ -227,10 +234,12 @@ import com.example.chic_it_app.Model.User;
 import com.example.chic_it_app.Model.api.RetrofitClient;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -250,13 +259,13 @@ public class SearchActivity extends AppCompatActivity {
 //        getSupportFragmentManager().beginTransaction()
 //                .add(android.R.id.content, new SearchFragment()).commit();
 
-        logout = findViewById(R.id.logOut);
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog_exit();
-            }
-        });
+//        logout = findViewById(R.id.logOut);
+//        logout.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                dialog_exit();
+//            }
+//        });
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -278,6 +287,8 @@ public class SearchActivity extends AppCompatActivity {
                     case R.id.nav_search:
                         startActivity(new Intent(SearchActivity.this , UserSearch.class));
                         break;
+                    case R.id.nav_logout:
+                        dialog_exit();
                     //if you want to search posts by description
                     case R.id.nav_home :
                         startActivity(new Intent(SearchActivity.this , SearchActivity.class));
@@ -298,7 +309,7 @@ public class SearchActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                filterPost(newText);
+                filter_post(newText);
                 return true;
             }
         });
@@ -327,7 +338,39 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
     }
+    private void filter_post(String text){
+        List<Post> filterList = new ArrayList<>();
+        for(Post post : mPosts){
+            Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().getPostItems(post.getPostid());
+            call.enqueue(new Callback<ResponseBody>() {
+                @RequiresApi(api = Build.VERSION_CODES.M)
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    ResponseBody itemsList = response.body();
+                    String it = null;
+                    try {
+                        it = itemsList.string();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    if (it != null) {
+                        System.out.println(text);
+                        System.out.println("stav:    "+ it);
+                        if(it.contains(text)){
+                            filterList.add(post);
+                        }
+                    }
+                }
 
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    // Handle the failure case
+                    // ...
+                }
+            });
+        }
+        postAdapter.setFilter(filterList);
+    }
     private void filterPost(String text) {
         List<Post> filterList = new ArrayList<>();
         for(Post post : mPosts){
