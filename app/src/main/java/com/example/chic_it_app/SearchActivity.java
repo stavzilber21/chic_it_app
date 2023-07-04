@@ -29,10 +29,15 @@ import com.example.chic_it_app.Model.User;
 import com.example.chic_it_app.Model.api.RetrofitClient;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -44,23 +49,13 @@ public class SearchActivity extends AppCompatActivity {
     private List<Post> mPosts;
     private PostAdapter postAdapter;
     private SearchView searchView;
-    private ImageView logout;
 
     @SuppressLint("MissingInflatedId")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
-//        getSupportFragmentManager().beginTransaction()
-//                .add(android.R.id.content, new SearchFragment()).commit();
 
-//        logout = findViewById(R.id.logOut);
-//        logout.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                dialog_exit();
-//            }
-//        });
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -83,7 +78,8 @@ public class SearchActivity extends AppCompatActivity {
                         startActivity(new Intent(SearchActivity.this , UserSearch.class));
                         break;
                     case R.id.nav_logout:
-                        dialog_exit();
+                        startActivity(new Intent(SearchActivity.this , LoginActivity.class));
+//                        dialog_exit();
                     //if you want to search posts by description
                     case R.id.nav_home :
                         startActivity(new Intent(SearchActivity.this , SearchActivity.class));
@@ -143,16 +139,45 @@ public class SearchActivity extends AppCompatActivity {
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                     ResponseBody itemsList = response.body();
                     String it = null;
+                    JSONObject itemObject = new JSONObject();
                     try {
                         it = itemsList.string();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                     if (it != null) {
-                        System.out.println(text);
-                        System.out.println("stav:    "+ it);
-                        if(it.contains(text)){
-                            filterList.add(post);
+                        try {
+                            itemObject = new JSONObject(it);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+//                        System.out.println(text);
+//                        System.out.println("stav:    "+ it);
+//                        if(it.contains(text)){
+//                            filterList.add(post);
+//                        }
+                        for (Iterator<String> iter = itemObject.keys(); iter.hasNext(); ) {
+                            String key = iter.next();
+                            JSONObject innerObject = null;
+                            try {
+                                innerObject = (JSONObject) itemObject.get(key);
+                                System.out.println("stav:    "+ innerObject);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            for (Iterator<String> iterator = innerObject.keys(); iterator.hasNext(); ) {
+                                String innerKey = iterator.next();
+                                String value = null;
+                                try {
+                                    value = (String) innerObject.get(innerKey);
+                                    System.out.println("zilber:    "+ value);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                if (value.contains(text) && !filterList.contains(post)) {
+                                    filterList.add(post);
+                                }
+                            }
                         }
                     }
                 }
