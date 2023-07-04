@@ -270,7 +270,8 @@ public class UserSearch extends AppCompatActivity {
                         startActivity(new Intent(UserSearch.this , UserSearch.class));
                         break;
                     case R.id.nav_logout:
-                        dialog_exit();
+                        startActivity(new Intent(UserSearch.this , LoginActivity.class));
+//                        dialog_exit();
                     //if you want to search posts by description
                     case R.id.nav_home :
                         startActivity(new Intent(UserSearch.this , SearchActivity.class));
