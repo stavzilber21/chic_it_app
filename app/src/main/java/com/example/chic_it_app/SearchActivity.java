@@ -16,6 +16,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -28,6 +29,8 @@ import com.example.chic_it_app.Model.Post;
 import com.example.chic_it_app.Model.User;
 import com.example.chic_it_app.Model.api.RetrofitClient;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,13 +52,17 @@ public class SearchActivity extends AppCompatActivity {
     private List<Post> mPosts;
     private PostAdapter postAdapter;
     private SearchView searchView;
+    private List<String> idList;
+    private FirebaseUser fUser;
+
+
 
     @SuppressLint("MissingInflatedId")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
-
+        fUser = FirebaseAuth.getInstance().getCurrentUser();
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -64,7 +71,9 @@ public class SearchActivity extends AppCompatActivity {
         recyclerView.setAdapter(postAdapter);
         searchView = findViewById(R.id.searchView);
         searchView.clearFocus();
-        readPosts();
+        idList = new ArrayList<>();
+//        readPosts();
+        getFollowings();
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -108,27 +117,149 @@ public class SearchActivity extends AppCompatActivity {
 
     }
 
-
     private void readPosts() {
         Call<List<Post>> call = RetrofitClient.getInstance().getAPI().homePosts();
         call.enqueue(new Callback<List<Post>>() {
             @Override
             public void onResponse(Call<List<Post>> call, Response<List<Post>> response) {
                 mPosts.clear();
+                List<Post> post_unfollow = new ArrayList<>();
                 List<Post> postsList = response.body();
                 if (postsList != null) {
-                    mPosts.addAll(postsList);
-                    Collections.reverse(mPosts);
+                    for(Post post : postsList){
+                        if (idList != null && idList.contains(post.getPublisher())) {
+                            mPosts.add(post);
+                        }
+                        else{
+                            post_unfollow.add(post);
+                        }
+                    }
+                    mPosts.addAll(post_unfollow);
+
                     postAdapter.notifyDataSetChanged();
                 }
             }
 
             @Override
             public void onFailure(Call<List<Post>> call, Throwable t) {
+                // Handle failure
+            }
+        });
 
+    }
+
+    private void getFollowings() {
+        Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().getFollowings(fUser.getUid());
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                idList.clear();
+                if (response.isSuccessful()) {
+                    String ans = response.body().byteStream().toString();
+                    int start = ans.indexOf("=");
+                    int end = ans.indexOf("]");
+                    String[] followingList = ans.substring(start+1,end).split(",");
+                    if (followingList != null) {
+                        for(String str: followingList){
+                            if(!str.equals(fUser.getUid()))
+                                idList.add(str);
+                        }
+                    }
+                    readPosts();
+                } else {
+                    Log.d("Fail", "Request failed");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.d("Fail", t.getMessage());
             }
         });
     }
+//    private void readPosts() {
+//        Call<List<Post>> call = RetrofitClient.getInstance().getAPI().homePosts();
+//        call.enqueue(new Callback<List<Post>>() {
+//            @Override
+//            public void onResponse(Call<List<Post>> call, Response<List<Post>> response) {
+//                mPosts.clear();
+//                List<Post> postsList = response.body();
+//                if (postsList != null) {
+//                    mPosts.addAll(postsList);
+//                    Collections.reverse(mPosts);
+//                    postAdapter.notifyDataSetChanged();
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<List<Post>> call, Throwable t) {
+//
+//            }
+//        });
+//    }
+//    private void filter_post(String text){
+//        List<Post> filterList = new ArrayList<>();
+//        for(Post post : mPosts){
+//            Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().getPostItems(post.getPostid());
+//            call.enqueue(new Callback<ResponseBody>() {
+//                @RequiresApi(api = Build.VERSION_CODES.M)
+//                @Override
+//                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                    ResponseBody itemsList = response.body();
+//                    String it = null;
+//                    JSONObject itemObject = new JSONObject();
+//                    try {
+//                        it = itemsList.string();
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                    if (it != null) {
+//                        try {
+//                            itemObject = new JSONObject(it);
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+////                        System.out.println(text);
+////                        System.out.println("stav:    "+ it);
+////                        if(it.contains(text)){
+////                            filterList.add(post);
+////                        }
+//                        for (Iterator<String> iter = itemObject.keys(); iter.hasNext(); ) {
+//                            String key = iter.next();
+//                            JSONObject innerObject = null;
+//                            try {
+//                                innerObject = (JSONObject) itemObject.get(key);
+//                                System.out.println("stav:    "+ innerObject);
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                            }
+//                            for (Iterator<String> iterator = innerObject.keys(); iterator.hasNext(); ) {
+//                                String innerKey = iterator.next();
+//                                String value = null;
+//                                try {
+//                                    value = (String) innerObject.get(innerKey);
+//                                    System.out.println("zilber:    "+ value);
+//                                } catch (JSONException e) {
+//                                    e.printStackTrace();
+//                                }
+//                                if (value.contains(text) && !filterList.contains(post)) {
+//                                    filterList.add(post);
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//
+//                @Override
+//                public void onFailure(Call<ResponseBody> call, Throwable t) {
+//                    // Handle the failure case
+//                    // ...
+//                }
+//            });
+//        }
+//        postAdapter.setFilter(filterList);
+//    }
+
     private void filter_post(String text){
         List<Post> filterList = new ArrayList<>();
         for(Post post : mPosts){
@@ -151,17 +282,13 @@ public class SearchActivity extends AppCompatActivity {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-//                        System.out.println(text);
-//                        System.out.println("stav:    "+ it);
-//                        if(it.contains(text)){
-//                            filterList.add(post);
-//                        }
+
                         for (Iterator<String> iter = itemObject.keys(); iter.hasNext(); ) {
+                            int flag=0;
                             String key = iter.next();
                             JSONObject innerObject = null;
                             try {
                                 innerObject = (JSONObject) itemObject.get(key);
-                                System.out.println("stav:    "+ innerObject);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -170,15 +297,21 @@ public class SearchActivity extends AppCompatActivity {
                                 String value = null;
                                 try {
                                     value = (String) innerObject.get(innerKey);
-                                    System.out.println("zilber:    "+ value);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
                                 if (value.contains(text) && !filterList.contains(post)) {
                                     filterList.add(post);
+                                    flag=1;
+                                    break;
                                 }
                             }
+                            if (flag==1){
+                                break;
+                            }
                         }
+                        postAdapter.setFilter(filterList);
+
                     }
                 }
 
@@ -189,7 +322,6 @@ public class SearchActivity extends AppCompatActivity {
                 }
             });
         }
-        postAdapter.setFilter(filterList);
     }
     private void filterPost(String text) {
         List<Post> filterList = new ArrayList<>();

@@ -26,8 +26,10 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -125,8 +127,8 @@ public class ProfileActivity extends AppCompatActivity {
                 }
             }
         });
-        followers.setText("3");
-        following.setText("2");
+//        followers.setText("3");
+//        following.setText("2");
         recyclerView.setVisibility(View.VISIBLE);
         recyclerViewLikes.setVisibility(View.GONE);
 
@@ -267,31 +269,23 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
     }
+
+
     private void getFollowersAndFollowingCount() {
-        System.out.println("stav zilber");
         fUser = FirebaseAuth.getInstance().getCurrentUser();
         Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().getFollowersAndFollowingCount(fUser.getUid());
         System.out.println(fUser.getUid());
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-//                if (response.isSuccessful()) {
-                    String countsResponse = response.body().toString();
-//                    System.out.println("hodaya: "+ countsResponse);
-//                    if (countsResponse != null) {
-                    String[] counts = countsResponse.split(", ");
-                    if (counts.length == 2) {
-                        String followersCount = counts[0].substring(counts[0].indexOf(":") + 1).trim();
-                        String followingCount = counts[1].substring(counts[1].indexOf(":") + 1).trim();
-                        System.out.println("stav: -----------------------------------------------"+followersCount);
-
-                        followers.setText(followersCount);
-                        following.setText(followingCount);
-//                        }
-//                    }
-//                } else {
-//                    Log.d("Fail", "Request failed");
-                }
+                String countsResponse = response.body().byteStream().toString();
+                int start = countsResponse.indexOf("[");
+                int end = countsResponse.indexOf("]");
+                String[] counts = countsResponse.substring(start+6,end).split(",");
+                String followersCount = counts[0];
+                String followingCount = counts[1];
+                followers.setText(followersCount);
+                following.setText(followingCount);
             }
 
             @Override

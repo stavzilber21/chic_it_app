@@ -25,8 +25,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.chic_it_app.Model.User;
 import com.example.chic_it_app.Model.api.RetrofitClient;
+import com.example.chic_it_app.PostActivity;
 import com.example.chic_it_app.PostDetailActivity;
 import com.example.chic_it_app.ProfileActivity;
+import com.example.chic_it_app.SearchActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -39,7 +41,10 @@ import com.example.chic_it_app.R;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -158,6 +163,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
                 });
                 AlertDialog dialog = builder.create();
                 dialog.show();
+                Intent intent = new Intent(mContext, SearchActivity.class);
+                mContext.startActivity(intent);
+
+
             }
         });
 
@@ -197,7 +206,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
             }
         });
 
-
         holder.item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -223,20 +231,97 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
                             messageTextView.setPadding(16, 16, 16, 16); // Adjust padding as needed
                             messageTextView.setTypeface(null, Typeface.BOLD); // Set the text style to bold
                             messageTextView.setTypeface(ResourcesCompat.getFont(mContext, R.font.calibrib));
-
+                            HashMap<String, String> resultMap = new HashMap<>();
                             // Split the items based on "},"
+                            it=  it.substring(2);
                             String[] itemList = it.split("\\},");
                             StringBuilder formattedText = new StringBuilder();
+
                             for (int i = 0; i < itemList.length; i++) {
                                 String item = itemList[i].trim();
+                                System.out.println("haim: "+ item);
                                 if (item.endsWith("}")) {
-                                    item = item.substring(0, item.length() - 1); // Remove the trailing "}"
+                                    item = item.substring(0, item.length() - 2); // Remove the trailing "}"
                                 }
-                                formattedText.append(formatItem(item));
+                                // Match the key-value pairs using regex
+                                Pattern pattern = Pattern.compile("\"(\\w+)\":\"([^\"]*)\"");
+                                Matcher matcher = pattern.matcher(item);
+
+                                // Extract and add key-value pairs to the HashMap
+//                                while (matcher.find()) {
+//                                    String key = matcher.group(1);
+//                                    String value = matcher.group(2);
+//                                    resultMap.put(key, value);
+//                                }
+                                HashMap<String, String> newHashMap = new HashMap<>();
+//                                newHashMap.put("name ", "value1");
+//                                newHashMap.put("price", "value2");
+//                                newHashMap.put("store ", "value3");
+//                                newHashMap.put("more ", "value3");
+
+
+                                // Add the new key-value pair at the beginning
+//                                newHashMap.put(key, value);
+//
+//                                // Add the existing key-value pairs to the new LinkedHashMap
+////                                newHashMap.putAll(hashMap);
+                                while (matcher.find()) {
+                                    String key = matcher.group(1);
+                                    String value = matcher.group(2);
+//
+//                                    if(key.equals("name")){
+//                                        newHashMap.put(key,value );
+//                                    }
+//                                    if(key.equals("price")){
+//                                        newHashMap.put("price",value);
+//                                    }
+//                                    if(key.equals("store")){
+//                                        newHashMap.put("store",value);
+//                                    }
+//                                    if(key.equals("more")){
+//                                        newHashMap.put("more",value);
+//                                    }
+//
+//                                    // Check if the key is "name" or "more"
+//                                    // If it is "name", put it at the beginning; if it is "more", put it at the end
+                                    if (key.equals("name")) {
+                                        StringBuilder sb = new StringBuilder();
+                                        sb.append("name").append(": ").append(value).append("\n ");
+                                        formattedText.append(sb);
+//                                        newHashMap.put(key, value);
+//                                        newHashMap.putAll(resultMap);
+//                                        resultMap.clear();
+//                                        resultMap.putAll(newHashMap);
+//                                        newHashMap.clear();
+//                                        resultMap.put(key, value);
+
+                                    } else if (key.equals("more")) {
+                                        resultMap.put(key, value);
+                                    } else {
+                                        // For other keys, put them in their natural order (order of appearance in the input string)
+                                        resultMap.put(key, value);
+                                    }
+                                }
+                                StringBuilder sb = new StringBuilder();
+                                for (String key : resultMap.keySet()) {
+                                    String value = resultMap.get(key);
+                                    sb.append(key).append(": ").append(value).append("\n ");
+                                }
+//                                formattedText.append(formatItem(item.substring(5)));
+                                formattedText.append(sb);
+//                                StringBuilder ans =   formatItem(item);
+//                                formattedText.append(ann);
+//                                formattedText = new StringBuilder(formattedText.substring(3));
                                 if (i < itemList.length - 1) {
                                     formattedText.append("\n\n"); // Add a double line break after each item
                                 }
                             }
+                            Pattern pattern = Pattern.compile("\\b(\\w+)\\s*:\\s*'([^']*)'\\b");
+                            Matcher matcher = pattern.matcher(formattedText);
+
+
+
+
 
                             messageTextView.setText(formattedText.toString());
                             builder.setView(messageTextView);
@@ -259,6 +344,67 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
                 });
             }
         });
+//        holder.item.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().getPostItems(post.getPostid());
+//                call.enqueue(new Callback<ResponseBody>() {
+//                    @RequiresApi(api = Build.VERSION_CODES.M)
+//                    @Override
+//                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                        ResponseBody itemsList = response.body();
+//                        String it = null;
+//                        try {
+//                            it = itemsList.string();
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
+//                        if (it != null) {
+//                            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+//                            builder.setTitle("Items");
+//                            TextView messageTextView = new TextView(mContext);
+//                            messageTextView.setTextAppearance(android.R.style.TextAppearance_Medium);
+////                            messageTextView.setTextColor(Color.BLUE); // Set the text color to blue
+//                            messageTextView.setBackgroundColor(Color.parseColor("#FFC0CB")); // Pink color
+//                            messageTextView.setPadding(16, 16, 16, 16); // Adjust padding as needed
+//                            messageTextView.setTypeface(null, Typeface.BOLD); // Set the text style to bold
+//                            messageTextView.setTypeface(ResourcesCompat.getFont(mContext, R.font.calibrib));
+//
+//                            // Split the items based on "},"
+//                            String[] itemList = it.split("\\},");
+//                            StringBuilder formattedText = new StringBuilder();
+//                            for (int i = 0; i < itemList.length; i++) {
+//                                String item = itemList[i].trim();
+//                                if (item.endsWith("}")) {
+//                                    item = item.substring(0, item.length() - 1); // Remove the trailing "}"
+//                                }
+//                                formattedText.append(formatItem(item));
+//                                if (i < itemList.length - 1) {
+//                                    formattedText.append("\n\n"); // Add a double line break after each item
+//                                }
+//                            }
+//
+//                            messageTextView.setText(formattedText.toString());
+//                            builder.setView(messageTextView);
+//                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    dialog.dismiss();
+//                                }
+//                            });
+//                            AlertDialog dialog = builder.create();
+//                            dialog.show();
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+//                        // Handle the failure case
+//                        // ...
+//                    }
+//                });
+//            }
+//        });
 
 
 

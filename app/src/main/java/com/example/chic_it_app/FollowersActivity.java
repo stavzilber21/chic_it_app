@@ -110,8 +110,11 @@ public class FollowersActivity extends AppCompatActivity {
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 idList.clear();
                 if (response.isSuccessful()) {
-                    String ans = response.body().toString();
-                    String[] followersList = ans.split(",");
+                    String ans = response.body().byteStream().toString();
+                    int start = ans.indexOf("=");
+                    int end = ans.indexOf("]");
+                    String[] followersList = ans.substring(start+1,end).split(",");
+                    //String[] followersList = ans.split(",");
                     if (followersList != null) {
                         for(String str: followersList){
                             idList.add(str);
@@ -159,8 +162,10 @@ public class FollowersActivity extends AppCompatActivity {
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 idList.clear();
                 if (response.isSuccessful()) {
-                    String ans = response.body().toString();
-                    String[] followingList = ans.split(",");
+                    String ans = response.body().byteStream().toString();
+                    int start = ans.indexOf("=");
+                    int end = ans.indexOf("]");
+                    String[] followingList = ans.substring(start+1,end).split(",");
                     if (followingList != null) {
                         for(String str: followingList){
                             idList.add(str);

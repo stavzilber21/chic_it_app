@@ -65,6 +65,12 @@ public interface API {
             @Query("uid") String uid
     );
 
+//    @GET("getFollowersAndFollowingCount")
+//    Call<List<Integer>> getFollowersAndFollowingCount(
+//            @Query("uid") String uid
+//
+//    );
+
     @GET("getFollowings")
     Call<ResponseBody> getFollowings(
             @Query("uid") String uid
