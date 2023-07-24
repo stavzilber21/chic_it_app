@@ -9,6 +9,13 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
+import android.text.Html;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.AbsoluteSizeSpan;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -59,6 +66,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
     private Context mContext;
     private List<Post> mPosts;
     private FirebaseUser firebaseUser;
+    private String[] sizeGender;
 
     public PostAdapter(Context mContext, List<Post> mPosts) {
         this.mContext = mContext;
@@ -80,12 +88,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
 
     @Override
     public void onBindViewHolder(@NonNull final Viewholder holder, int position) {
-
+        sizeGender = new String[2];
         final Post post = mPosts.get(position);
         Picasso.get().load(post.getImageurl()).into(holder.postImage);
-//        holder.description.setText(post.getDescription());
-//        holder.price.setText(post.getPrice());
-//        holder.store.setText(post.getStore());
         holder.type.setText(post.getType());
 
         //to display the username of publisher and his image profile
@@ -100,6 +105,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
                     Picasso.get().load(user.getImageurl()).placeholder(R.mipmap.ic_launcher).into(holder.imageProfile);
                 }
                 holder.username.setText(user.getUsername());
+                sizeGender[0]= user.getSize();
+                sizeGender[1]= user.getGender();
             }
 
             @Override
@@ -133,42 +140,42 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
 
         /* if you click on the delete icon we check if it is your post, If it's a post you uploaded, we make sure the user really
          wants to delete the post, and if so, we remove it from Firebase*/
+//        holder.delete.setOnClickListener(new View.OnClickListener() {
+
         holder.delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
                 builder.setCancelable(true);
-                builder.setTitle("you sure that you want to delete?");
-                builder.setMessage("");
-                builder.setPositiveButton("yes", (dialog, which) -> {
+                builder.setTitle("Are you sure that you want to delete?");
+                builder.setPositiveButton("Yes", (dialog, which) -> {
                     FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
-                    Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().deletePost(post.getPostid(),post.getPublisher(),fUser.getUid());
+                    Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().deletePost(post.getPostid(), post.getPublisher(), fUser.getUid());
                     call.enqueue(new Callback<ResponseBody>() {
                         @Override
                         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                            // If the deletion is successful, remove the post from the list
+                            mPosts.remove(post);
                             notifyDataSetChanged();
-                            Toast.makeText(mContext, "deleted!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mContext, "Deleted!", Toast.LENGTH_SHORT).show();
                         }
 
                         @Override
                         public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+                            Toast.makeText(mContext, "Failed to delete post!", Toast.LENGTH_SHORT).show();
                         }
                     });
                 });
 
-                builder.setNegativeButton("no", (dialog, which) ->
+                builder.setNegativeButton("No", (dialog, which) ->
                 {
                     Toast.makeText(mContext, "The post was not deleted!", Toast.LENGTH_SHORT).show();
                 });
                 AlertDialog dialog = builder.create();
                 dialog.show();
-                Intent intent = new Intent(mContext, SearchActivity.class);
-                mContext.startActivity(intent);
-
-
             }
         });
+
 
 //        holder.imageProfile.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -206,6 +213,19 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
             }
         });
 
+        //        holder.username.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                mContext.getSharedPreferences("PROFILE", Context.MODE_PRIVATE)
+//                        .edit().putString("profileId", post.getPublisher()).apply();
+//
+//                ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction()
+//                        .replace(R.id.fragment_container, new ProfileFragment()).commit();
+//            }
+//        });
+
+
+
         holder.item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -223,78 +243,47 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
                         }
                         if (it != null) {
                             AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                            builder.setTitle("Items");
+                            builder.setTitle("Details: ");
+
+                            // Change the data type to SpannableStringBuilder
+                            SpannableStringBuilder formattedText = new SpannableStringBuilder();
+
                             TextView messageTextView = new TextView(mContext);
                             messageTextView.setTextAppearance(android.R.style.TextAppearance_Medium);
-//                            messageTextView.setTextColor(Color.BLUE); // Set the text color to blue
+
                             messageTextView.setBackgroundColor(Color.parseColor("#FFC0CB")); // Pink color
                             messageTextView.setPadding(16, 16, 16, 16); // Adjust padding as needed
                             messageTextView.setTypeface(null, Typeface.BOLD); // Set the text style to bold
                             messageTextView.setTypeface(ResourcesCompat.getFont(mContext, R.font.calibrib));
+
                             HashMap<String, String> resultMap = new HashMap<>();
+
                             // Split the items based on "},"
                             it=  it.substring(2);
                             String[] itemList = it.split("\\},");
-                            StringBuilder formattedText = new StringBuilder();
 
                             for (int i = 0; i < itemList.length; i++) {
                                 String item = itemList[i].trim();
-                                System.out.println("haim: "+ item);
+
                                 if (item.endsWith("}")) {
                                     item = item.substring(0, item.length() - 2); // Remove the trailing "}"
                                 }
+
                                 // Match the key-value pairs using regex
                                 Pattern pattern = Pattern.compile("\"(\\w+)\":\"([^\"]*)\"");
                                 Matcher matcher = pattern.matcher(item);
 
-                                // Extract and add key-value pairs to the HashMap
-//                                while (matcher.find()) {
-//                                    String key = matcher.group(1);
-//                                    String value = matcher.group(2);
-//                                    resultMap.put(key, value);
-//                                }
-                                HashMap<String, String> newHashMap = new HashMap<>();
-//                                newHashMap.put("name ", "value1");
-//                                newHashMap.put("price", "value2");
-//                                newHashMap.put("store ", "value3");
-//                                newHashMap.put("more ", "value3");
-
-
-                                // Add the new key-value pair at the beginning
-//                                newHashMap.put(key, value);
-//
-//                                // Add the existing key-value pairs to the new LinkedHashMap
-////                                newHashMap.putAll(hashMap);
                                 while (matcher.find()) {
                                     String key = matcher.group(1);
                                     String value = matcher.group(2);
-//
-//                                    if(key.equals("name")){
-//                                        newHashMap.put(key,value );
-//                                    }
-//                                    if(key.equals("price")){
-//                                        newHashMap.put("price",value);
-//                                    }
-//                                    if(key.equals("store")){
-//                                        newHashMap.put("store",value);
-//                                    }
-//                                    if(key.equals("more")){
-//                                        newHashMap.put("more",value);
-//                                    }
-//
-//                                    // Check if the key is "name" or "more"
-//                                    // If it is "name", put it at the beginning; if it is "more", put it at the end
-                                    if (key.equals("name")) {
-                                        StringBuilder sb = new StringBuilder();
-                                        sb.append("name").append(": ").append(value).append("\n ");
-                                        formattedText.append(sb);
-//                                        newHashMap.put(key, value);
-//                                        newHashMap.putAll(resultMap);
-//                                        resultMap.clear();
-//                                        resultMap.putAll(newHashMap);
-//                                        newHashMap.clear();
-//                                        resultMap.put(key, value);
 
+                                    if (key.equals("name")) {
+                                        // Create a SpannableString to apply custom size, color, and underline to the "name" field
+                                        SpannableString spannableName = new SpannableString(value + "\n");
+                                        spannableName.setSpan(new AbsoluteSizeSpan(24, true), 0, spannableName.length(), SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                        spannableName.setSpan(new ForegroundColorSpan(Color.parseColor("#1FBED6")), 0, spannableName.length(), SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                        spannableName.setSpan(new UnderlineSpan(), 0, spannableName.length(), SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                        formattedText.append(spannableName);
                                     } else if (key.equals("more")) {
                                         resultMap.put(key, value);
                                     } else {
@@ -302,28 +291,26 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
                                         resultMap.put(key, value);
                                     }
                                 }
+
                                 StringBuilder sb = new StringBuilder();
                                 for (String key : resultMap.keySet()) {
                                     String value = resultMap.get(key);
                                     sb.append(key).append(": ").append(value).append("\n ");
                                 }
-//                                formattedText.append(formatItem(item.substring(5)));
                                 formattedText.append(sb);
-//                                StringBuilder ans =   formatItem(item);
-//                                formattedText.append(ann);
-//                                formattedText = new StringBuilder(formattedText.substring(3));
+
                                 if (i < itemList.length - 1) {
                                     formattedText.append("\n\n"); // Add a double line break after each item
                                 }
                             }
-                            Pattern pattern = Pattern.compile("\\b(\\w+)\\s*:\\s*'([^']*)'\\b");
-                            Matcher matcher = pattern.matcher(formattedText);
+//                            sizeAndGender(post.getPublisher());
+                            String size = sizeGender[0];
+                            String gender = sizeGender[1];
+                            formattedText.append("\n");
+                            formattedText.append("Size: " + size+ "\n");
+                            formattedText.append("Gender: " + gender);
 
-
-
-
-
-                            messageTextView.setText(formattedText.toString());
+                            messageTextView.setText(formattedText, TextView.BufferType.SPANNABLE);
                             builder.setView(messageTextView);
                             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 @Override
@@ -344,81 +331,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
                 });
             }
         });
-//        holder.item.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().getPostItems(post.getPostid());
-//                call.enqueue(new Callback<ResponseBody>() {
-//                    @RequiresApi(api = Build.VERSION_CODES.M)
-//                    @Override
-//                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-//                        ResponseBody itemsList = response.body();
-//                        String it = null;
-//                        try {
-//                            it = itemsList.string();
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-//                        if (it != null) {
-//                            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-//                            builder.setTitle("Items");
-//                            TextView messageTextView = new TextView(mContext);
-//                            messageTextView.setTextAppearance(android.R.style.TextAppearance_Medium);
-////                            messageTextView.setTextColor(Color.BLUE); // Set the text color to blue
-//                            messageTextView.setBackgroundColor(Color.parseColor("#FFC0CB")); // Pink color
-//                            messageTextView.setPadding(16, 16, 16, 16); // Adjust padding as needed
-//                            messageTextView.setTypeface(null, Typeface.BOLD); // Set the text style to bold
-//                            messageTextView.setTypeface(ResourcesCompat.getFont(mContext, R.font.calibrib));
-//
-//                            // Split the items based on "},"
-//                            String[] itemList = it.split("\\},");
-//                            StringBuilder formattedText = new StringBuilder();
-//                            for (int i = 0; i < itemList.length; i++) {
-//                                String item = itemList[i].trim();
-//                                if (item.endsWith("}")) {
-//                                    item = item.substring(0, item.length() - 1); // Remove the trailing "}"
-//                                }
-//                                formattedText.append(formatItem(item));
-//                                if (i < itemList.length - 1) {
-//                                    formattedText.append("\n\n"); // Add a double line break after each item
-//                                }
-//                            }
-//
-//                            messageTextView.setText(formattedText.toString());
-//                            builder.setView(messageTextView);
-//                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                                @Override
-//                                public void onClick(DialogInterface dialog, int which) {
-//                                    dialog.dismiss();
-//                                }
-//                            });
-//                            AlertDialog dialog = builder.create();
-//                            dialog.show();
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-//                        // Handle the failure case
-//                        // ...
-//                    }
-//                });
-//            }
-//        });
 
 
 
-
-//        holder.username.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                mContext.getSharedPreferences("PROFILE", Context.MODE_PRIVATE)
-//                        .edit().putString("profileId", post.getPublisher()).apply();
-//
-//                ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction()
-//                        .replace(R.id.fragment_container, new ProfileFragment()).commit();
-//            }
-//        });
 
         /*If a user clicks on the button postImage It goes to this post's page only. */
         holder.postImage.setOnClickListener(new View.OnClickListener() {
@@ -476,10 +391,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
         public ImageView save;
         public TextView username;
         public TextView contact_us;
-        public TextView author;
-//        TextView description;
-//        TextView price;
-//        TextView store;
         TextView type;
         ImageView item;
 
@@ -493,9 +404,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
             delete = itemView.findViewById(R.id.delete);
             username = itemView.findViewById(R.id.username);
             contact_us = itemView.findViewById(R.id.contact_us);
-//            description = itemView.findViewById(R.id.description);
-//            store = itemView.findViewById(R.id.store);
-//            price = itemView.findViewById(R.id.price);
             type = itemView.findViewById(R.id.type);
             item = itemView.findViewById(R.id.item);
 
@@ -532,52 +440,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
         });
 
     }
-    private String formatItem(String item) {
-        String[] itemDetails = item.split(",");
-        StringBuilder formattedItem = new StringBuilder();
-        for (String detail : itemDetails) {
-            String[] detailPair = detail.split(":");
-            if (detailPair.length == 2) {
-                String key = detailPair[0].trim();
-                String value = detailPair[1].trim();
-                if (key.equalsIgnoreCase("name")) {
-                    formattedItem.append("Name: ").append(value).append("\n");
-                } else if (key.equalsIgnoreCase("store")) {
-                    formattedItem.append("Store: ").append(value).append("\n");
-                } else if (key.equalsIgnoreCase("price")) {
-                    formattedItem.append("Price: ").append(value).append("\n");
-                } else {
-                    formattedItem.append(detail).append("\n");
-                }
-            } else {
-                formattedItem.append(detail).append("\n");
-            }
-        }
-        return formattedItem.toString();
-    }
 
-    private String formatDetail(String detail) {
-        detail = detail.replaceAll("\\{", " ").replaceAll("\\d", " ");
-        return detail;
-    }
 
-//    private String getItem(String postId){
-//        Call<String> call = RetrofitClient.getInstance().getAPI().getPostItems(postId);
-//        call.enqueue(new Callback<String>() {
-//            @Override
-//            public void onResponse(Call<String> call, Response<String> response) {
-////                ResponseBody itemsList = response.body();
-//                String it = response.body();
-//                if (it != null) {
-//                    return it;
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<String> call, Throwable t) {
-//                // Handle the failure case
-//                // ...
-//            }
-//        });
-//    }
+
+
 }

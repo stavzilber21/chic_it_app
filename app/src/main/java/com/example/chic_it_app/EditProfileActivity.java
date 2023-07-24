@@ -65,7 +65,7 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
     private StorageReference storageRef;
 
     String[] gender_opt ={"male","female"};
-    String[] size_opt ={"s","m","l"};
+    String[] size_opt ={"S","M","L"};
 
     @SuppressLint("MissingInflatedId")
     @Override

@@ -54,7 +54,7 @@ public class SearchActivity extends AppCompatActivity {
     private SearchView searchView;
     private List<String> idList;
     private FirebaseUser fUser;
-
+    private List<String> sizeGender;
 
 
     @SuppressLint("MissingInflatedId")
@@ -72,7 +72,7 @@ public class SearchActivity extends AppCompatActivity {
         searchView = findViewById(R.id.searchView);
         searchView.clearFocus();
         idList = new ArrayList<>();
-//        readPosts();
+        sizeGender = new ArrayList<>();
         getFollowings();
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -89,7 +89,7 @@ public class SearchActivity extends AppCompatActivity {
                     case R.id.nav_logout:
                         startActivity(new Intent(SearchActivity.this , LoginActivity.class));
 //                        dialog_exit();
-                    //if you want to search posts by description
+                        //if you want to search posts by description
                     case R.id.nav_home :
                         startActivity(new Intent(SearchActivity.this , SearchActivity.class));
                         break;
@@ -177,92 +177,20 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
     }
-//    private void readPosts() {
-//        Call<List<Post>> call = RetrofitClient.getInstance().getAPI().homePosts();
-//        call.enqueue(new Callback<List<Post>>() {
-//            @Override
-//            public void onResponse(Call<List<Post>> call, Response<List<Post>> response) {
-//                mPosts.clear();
-//                List<Post> postsList = response.body();
-//                if (postsList != null) {
-//                    mPosts.addAll(postsList);
-//                    Collections.reverse(mPosts);
-//                    postAdapter.notifyDataSetChanged();
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<List<Post>> call, Throwable t) {
-//
-//            }
-//        });
-//    }
-//    private void filter_post(String text){
-//        List<Post> filterList = new ArrayList<>();
-//        for(Post post : mPosts){
-//            Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().getPostItems(post.getPostid());
-//            call.enqueue(new Callback<ResponseBody>() {
-//                @RequiresApi(api = Build.VERSION_CODES.M)
-//                @Override
-//                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-//                    ResponseBody itemsList = response.body();
-//                    String it = null;
-//                    JSONObject itemObject = new JSONObject();
-//                    try {
-//                        it = itemsList.string();
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//                    if (it != null) {
-//                        try {
-//                            itemObject = new JSONObject(it);
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        }
-////                        System.out.println(text);
-////                        System.out.println("stav:    "+ it);
-////                        if(it.contains(text)){
-////                            filterList.add(post);
-////                        }
-//                        for (Iterator<String> iter = itemObject.keys(); iter.hasNext(); ) {
-//                            String key = iter.next();
-//                            JSONObject innerObject = null;
-//                            try {
-//                                innerObject = (JSONObject) itemObject.get(key);
-//                                System.out.println("stav:    "+ innerObject);
-//                            } catch (JSONException e) {
-//                                e.printStackTrace();
-//                            }
-//                            for (Iterator<String> iterator = innerObject.keys(); iterator.hasNext(); ) {
-//                                String innerKey = iterator.next();
-//                                String value = null;
-//                                try {
-//                                    value = (String) innerObject.get(innerKey);
-//                                    System.out.println("zilber:    "+ value);
-//                                } catch (JSONException e) {
-//                                    e.printStackTrace();
-//                                }
-//                                if (value.contains(text) && !filterList.contains(post)) {
-//                                    filterList.add(post);
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//
-//                @Override
-//                public void onFailure(Call<ResponseBody> call, Throwable t) {
-//                    // Handle the failure case
-//                    // ...
-//                }
-//            });
-//        }
-//        postAdapter.setFilter(filterList);
-//    }
+
 
     private void filter_post(String text){
         List<Post> filterList = new ArrayList<>();
         for(Post post : mPosts){
+            sizeAndGender(post.getPublisher());
+            if(text=="M"||text=="S"||text=="L"||text=="female"||text=="male"){
+
+                if(sizeGender.get(0)==text||sizeGender.get(1)==text){
+                    filterList.add(post);
+                }
+                postAdapter.setFilter(filterList);
+            }
+            else{
             Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().getPostItems(post.getPostid());
             call.enqueue(new Callback<ResponseBody>() {
                 @RequiresApi(api = Build.VERSION_CODES.M)
@@ -321,6 +249,7 @@ public class SearchActivity extends AppCompatActivity {
                     // ...
                 }
             });
+            }
         }
     }
     private void filterPost(String text) {
@@ -407,6 +336,24 @@ public class SearchActivity extends AppCompatActivity {
         });
         AlertDialog dialog = builder.create();
         dialog.show();
+
+    }
+
+    private void sizeAndGender(String id){
+        Call<User> call = RetrofitClient.getInstance().getAPI().getUserDetails(id);
+        call.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                User user = response.body();
+                sizeGender.add(user.getSize());
+                sizeGender.add(user.getGender());
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                Log.d("Fail", t.getMessage());
+            }
+        });
 
     }
 

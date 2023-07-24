@@ -21,13 +21,16 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.chic_it_app.Adapter.PostAdapter;
 import com.example.chic_it_app.Fragments.CustomDialogFragment;
+import com.example.chic_it_app.Model.Post;
 import com.example.chic_it_app.Model.api.RetrofitClient;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -36,7 +39,9 @@ import com.google.firebase.storage.StorageTask;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 import okhttp3.ResponseBody;
@@ -52,15 +57,15 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
     StorageReference storageReference;
     ProgressDialog progressDialog;
     String imageUrl;
-//    EditText description;
-//    EditText store;
-//    EditText price;
+    private List<Post> mPosts;
     TextView post;
     Spinner type;
+    private List<String> idList;
     String[] types={"inspiration","For rent - used","For rent - new","For sale - new","For sale - used"};
     String choose;
-    Button add_item;
     private HashMap<String, HashMap<String, String>> items;
+    private PostAdapter postAdapter;
+    private FirebaseUser fUser;
 
 
 
@@ -73,22 +78,12 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
         close = findViewById(R.id.close);
         imageAdded = findViewById(R.id.image_added);
         post = findViewById(R.id.post);
-//        description = findViewById(R.id.description);
-//        store = findViewById(R.id.store);
-//        price = findViewById(R.id.price);
+        mPosts = new ArrayList<>();
+        postAdapter = new PostAdapter(this , mPosts);
         type = (Spinner) findViewById(R.id.typeSpinner);
+        idList = new ArrayList<>();
+        fUser = FirebaseAuth.getInstance().getCurrentUser();
 
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_main);
-
-//        openDialogButton = findViewById(R.id.open_dialog_button);
-//        openDialogButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                CustomDialogFragment dialogFragment = new CustomDialogFragment();
-//                dialogFragment.show(getSupportFragmentManager(), "CustomDialogFragment");
-//            }
-//        });
 
         Button openDialogButton = findViewById(R.id.add_item);
         openDialogButton.setOnClickListener(new View.OnClickListener() {
@@ -143,6 +138,65 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
     public void onNothingSelected(AdapterView<?> arg0) {
         // TODO Auto-generated method stub
     }
+    private void readPosts() {
+        Call<List<Post>> call = RetrofitClient.getInstance().getAPI().homePosts();
+        call.enqueue(new Callback<List<Post>>() {
+            @Override
+            public void onResponse(Call<List<Post>> call, Response<List<Post>> response) {
+                mPosts.clear();
+                List<Post> post_unfollow = new ArrayList<>();
+                List<Post> postsList = response.body();
+                if (postsList != null) {
+                    for(Post post : postsList){
+                        if (idList != null && idList.contains(post.getPublisher())) {
+                            mPosts.add(post);
+                        }
+                        else{
+                            post_unfollow.add(post);
+                        }
+                    }
+                    mPosts.addAll(post_unfollow);
+
+                    postAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Post>> call, Throwable t) {
+                // Handle failure
+            }
+        });
+
+    }
+    private void getFollowings() {
+        Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().getFollowings(fUser.getUid());
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                idList.clear();
+                if (response.isSuccessful()) {
+                    String ans = response.body().byteStream().toString();
+                    int start = ans.indexOf("=");
+                    int end = ans.indexOf("]");
+                    String[] followingList = ans.substring(start+1,end).split(",");
+                    if (followingList != null) {
+                        for(String str: followingList){
+                            if(!str.equals(fUser.getUid()))
+                                idList.add(str);
+                        }
+                    }
+                    readPosts();
+                } else {
+                    Log.d("Fail", "Request failed");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.d("Fail", t.getMessage());
+            }
+        });
+    }
 
     private void uploadImage() {
         progressDialog = new ProgressDialog(this);
@@ -170,9 +224,6 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
                     String jsonString = jsonItems.toString();
                     Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().addPost(imageUrl,
                             FirebaseAuth.getInstance().getCurrentUser().getUid(), jsonString, choose);
-//                    Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().makePost(imageUrl,
-//                            description.getText().toString(), store.getText().toString(), price.getText().toString(),
-//                            choose, FirebaseAuth.getInstance().getCurrentUser().getUid());
 
                     call.enqueue(new Callback<ResponseBody>() {
                         @Override
@@ -186,6 +237,7 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
                             Log.d("makePost", t.getMessage());
                         }
                     });
+                    getFollowings();
                     progressDialog.dismiss();
                     Toast.makeText(PostActivity.this, "The post has been uploaded!", Toast.LENGTH_SHORT).show();
                     startActivity(new Intent(PostActivity.this , SearchActivity.class));
