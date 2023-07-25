@@ -1,7 +1,4 @@
 package com.example.chic_it_app.Adapter;
-
-import static android.graphics.Typeface.BOLD;
-
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,10 +6,8 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
-import android.text.Html;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.UnderlineSpan;
@@ -29,30 +24,20 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.chic_it_app.Model.User;
 import com.example.chic_it_app.Model.api.RetrofitClient;
-import com.example.chic_it_app.PostActivity;
 import com.example.chic_it_app.PostDetailActivity;
 import com.example.chic_it_app.ProfileActivity;
-import com.example.chic_it_app.SearchActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
 import com.example.chic_it_app.Model.Post;
 import com.example.chic_it_app.R;
 import com.squareup.picasso.Picasso;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -176,18 +161,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
             }
         });
 
-
-//        holder.imageProfile.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                mContext.getSharedPreferences("PROFILE", Context.MODE_PRIVATE)
-//                        .edit().putString("profileId", post.getPublisher()).apply();
-//
-//                ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction()
-//                        .replace(R.id.fragment_container, new ProfileFragment()).commit();
-//            }
-//        });
-
         /*If a user clicks on the button imageProfile we display the profile picture*/
         holder.imageProfile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -212,19 +185,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
                 mContext.startActivity(intent);
             }
         });
-
-        //        holder.username.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                mContext.getSharedPreferences("PROFILE", Context.MODE_PRIVATE)
-//                        .edit().putString("profileId", post.getPublisher()).apply();
-//
-//                ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction()
-//                        .replace(R.id.fragment_container, new ProfileFragment()).commit();
-//            }
-//        });
-
-
 
         holder.item.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -303,7 +263,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
                                     formattedText.append("\n\n"); // Add a double line break after each item
                                 }
                             }
-//                            sizeAndGender(post.getPublisher());
                             String size = sizeGender[0];
                             String gender = sizeGender[1];
                             formattedText.append("\n");
@@ -331,9 +290,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
                 });
             }
         });
-
-
-
 
         /*If a user clicks on the button postImage It goes to this post's page only. */
         holder.postImage.setOnClickListener(new View.OnClickListener() {
@@ -432,16 +388,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder> {
                 }
 
             }
-
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-
             }
         });
-
     }
-
-
-
-
 }

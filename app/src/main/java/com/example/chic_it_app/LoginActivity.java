@@ -37,7 +37,6 @@ public class LoginActivity extends AppCompatActivity {
     EditText email, password;
     Button login;
     TextView txt_signup;
-
     FirebaseAuth auth;
 
     @Override
@@ -49,7 +48,6 @@ public class LoginActivity extends AppCompatActivity {
         password = findViewById(R.id.password);
         login = findViewById(R.id.login);
         txt_signup = findViewById(R.id.txt_signup);
-
         auth = FirebaseAuth.getInstance();
 
         txt_signup.setOnClickListener(new View.OnClickListener() {

@@ -3,28 +3,14 @@ package com.example.chic_it_app;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
 import com.example.chic_it_app.Adapter.PostAdapter;
 import com.example.chic_it_app.Model.Post;
-import com.example.chic_it_app.Model.User;
 import com.example.chic_it_app.Model.api.RetrofitClient;
-import com.example.chic_it_app.R;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;

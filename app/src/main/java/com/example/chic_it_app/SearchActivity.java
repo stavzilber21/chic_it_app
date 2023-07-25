@@ -182,13 +182,26 @@ public class SearchActivity extends AppCompatActivity {
     private void filter_post(String text){
         List<Post> filterList = new ArrayList<>();
         for(Post post : mPosts){
-            sizeAndGender(post.getPublisher());
-            if(text=="M"||text=="S"||text=="L"||text=="female"||text=="male"){
+            if(text.equals("M")||text.equals("S")||text.equals("L")||text.equals("female")||text.equals("male")){
+                Call<User> call = RetrofitClient.getInstance().getAPI().getUserDetails(post.getPublisher());
+                call.enqueue(new Callback<User>() {
+                    @Override
+                    public void onResponse(Call<User> call, Response<User> response) {
+                        User user = response.body();
+                        String size = user.getSize();
+                        String gender = user.getGender();
 
-                if(sizeGender.get(0)==text||sizeGender.get(1)==text){
-                    filterList.add(post);
-                }
-                postAdapter.setFilter(filterList);
+                        if(text.equals(size)||text.equals(gender)){
+                            filterList.add(post);
+                        }
+                        postAdapter.setFilter(filterList);
+                    }
+
+                    @Override
+                    public void onFailure(Call<User> call, Throwable t) {
+                        Log.d("Fail", t.getMessage());
+                    }
+                });
             }
             else{
             Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().getPostItems(post.getPostid());
@@ -339,23 +352,6 @@ public class SearchActivity extends AppCompatActivity {
 
     }
 
-    private void sizeAndGender(String id){
-        Call<User> call = RetrofitClient.getInstance().getAPI().getUserDetails(id);
-        call.enqueue(new Callback<User>() {
-            @Override
-            public void onResponse(Call<User> call, Response<User> response) {
-                User user = response.body();
-                sizeGender.add(user.getSize());
-                sizeGender.add(user.getGender());
-            }
-
-            @Override
-            public void onFailure(Call<User> call, Throwable t) {
-                Log.d("Fail", t.getMessage());
-            }
-        });
-
-    }
 
 
 }

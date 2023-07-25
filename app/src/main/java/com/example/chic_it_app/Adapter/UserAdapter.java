@@ -39,12 +39,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>{
     private boolean isFargment;
     private FirebaseUser firebaseUser;
 
-
-
-
     // function to enter the data
-    public UserAdapter(Context mContext, List<User> mUsers, boolean isFargment)
-    {
+    public UserAdapter(Context mContext, List<User> mUsers, boolean isFargment) {
         this.mContext = mContext;
         this.mUsers = mUsers;
         this.isFargment = isFargment;
@@ -101,20 +97,6 @@ Since our widgets are defined in a layout resource, we will need a LayoutInflate
             }
         });
 
-//        holder.itemView.setOnClickListener(new View.OnClickListener() {
-////            @Override
-////            public void onClick(View v) {
-////                if (isFargment) {
-////                    mContext.getSharedPreferences("PROFILE", Context.MODE_PRIVATE).edit().putString("profileId", user.getId()).apply();
-////
-////                    ((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ProfileFragment()).commit();
-////                } else {
-////                    Intent intent = new Intent(mContext, MainActivity.class);
-////                    intent.putExtra("publisherId", user.getId());
-////                    mContext.startActivity(intent);
-////                }
-////            }
-////        });
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -188,13 +170,10 @@ Since our widgets are defined in a layout resource, we will need a LayoutInflate
 //add the data to hashmap - save data
     private void addNotification(String userId) {
         HashMap<String, Object> map = new HashMap<>();
-
         map.put("userid", userId);
         map.put("text", "started following you.");
         map.put("postid", "");
         map.put("isPost", false);
-
         FirebaseDatabase.getInstance().getReference().child("Notifications").child(firebaseUser.getUid()).push().setValue(map);
     }
-
 }

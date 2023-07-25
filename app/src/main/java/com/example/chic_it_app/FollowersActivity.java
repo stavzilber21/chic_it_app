@@ -6,12 +6,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-
 import com.example.chic_it_app.Model.api.RetrofitClient;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -19,10 +17,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.example.chic_it_app.Adapter.UserAdapter;
 import com.example.chic_it_app.Model.User;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -33,7 +29,6 @@ public class FollowersActivity extends AppCompatActivity {
     private  String id;
     private String title;
     private List<String> idList;
-
     private RecyclerView recyclerView;
     private UserAdapter userAdapter;
     private List<User> mUsers;
@@ -83,26 +78,6 @@ public class FollowersActivity extends AppCompatActivity {
         }
     }
 
-//    private void getFollowers() {
-//
-//        FirebaseDatabase.getInstance().getReference().child("Follow").child(id).child("followers").addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                idList.clear();
-//                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-//                    idList.add((snapshot.getKey()));
-//                }
-//
-//                showUsers();
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
-//
-//    }
     private void getFollowers() {
         Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().getFollowers(id);
         call.enqueue(new Callback<ResponseBody>() {
@@ -134,27 +109,6 @@ public class FollowersActivity extends AppCompatActivity {
         });
     }
 
-
-    //    private void getFollowings() {
-//
-//        FirebaseDatabase.getInstance().getReference().child("Follow").child(id).child("following").addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                idList.clear();
-//                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-//                    idList.add((snapshot.getKey()));
-//                }
-//
-//                showUsers();
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
-//
-//    }
     private void getFollowings() {
         Call<ResponseBody> call = RetrofitClient.getInstance().getAPI().getFollowings(id);
         call.enqueue(new Callback<ResponseBody>() {
